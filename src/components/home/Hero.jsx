@@ -1,13 +1,18 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+
 import {
   motion,
   useMotionValue,
   useSpring,
   useReducedMotion,
 } from "framer-motion";
-import { ArrowUpRight, MessageCircle } from "lucide-react";
+
+import {
+  ArrowUpRight,
+  MessageCircle,
+} from "lucide-react";
 
 const WHATSAPP_URL =
   "https://wa.me/918983973799?text=" +
@@ -24,8 +29,42 @@ const kernels = [
   { top: "79%", left: "89%", size: 14, delay: 0.8 },
 ];
 
+/* ======================================
+   MOBILE DETECTION
+====================================== */
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 767px)").matches
+      : false
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+
+    const update = () => setIsMobile(media.matches);
+
+    update();
+
+    media.addEventListener("change", update);
+
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
+
+/* ======================================
+   MAIN HERO
+====================================== */
+
 export default function Hero() {
+  const isMobile = useIsMobile();
   const reducedMotion = useReducedMotion();
+
+  const disableHeavyAnimations = isMobile || reducedMotion;
+
   const [landed, setLanded] = useState(false);
 
   const mouseX = useMotionValue(0);
@@ -41,10 +80,18 @@ export default function Hero() {
     damping: 20,
   });
 
-  const handleMouseMove = (event) => {
-    if (!landed || reducedMotion) return;
+  /* ======================================
+     DESKTOP MOUSE PARALLAX
+  ====================================== */
 
-    if (event.pointerType !== "mouse") return;
+  const handleMouseMove = (event) => {
+    if (
+      disableHeavyAnimations ||
+      !landed ||
+      event.pointerType !== "mouse"
+    ) {
+      return;
+    }
 
     const rect = event.currentTarget.getBoundingClientRect();
 
@@ -63,27 +110,54 @@ export default function Hero() {
     mouseY.set(0);
   };
 
+  /* ======================================
+     CONTENT ANIMATION
+  ====================================== */
+
+  const contentReveal = (delay = 0) => ({
+    initial: reducedMotion
+      ? false
+      : {
+          opacity: 0,
+          y: isMobile ? 12 : 25,
+        },
+
+    animate: {
+      opacity: 1,
+      y: 0,
+    },
+
+    transition: {
+      duration: isMobile ? 0.45 : 0.7,
+      delay: isMobile ? 0 : delay,
+      ease,
+    },
+  });
+
   return (
     <section
       className="
-        relative isolate flex
-        min-h-[610px] items-center
-        overflow-hidden bg-[#171719]
+        relative isolate
+        overflow-hidden
+        bg-[#171719]
         text-white
-        sm:min-h-[640px]
         lg:min-h-[590px]
         xl:min-h-[640px]
       "
     >
-      {/* BACKGROUND */}
+      {/* ======================================
+          BACKGROUND
+      ====================================== */}
+
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(ellipse_at_70%_45%,#303033_0%,#1B1B1D_45%,#111113_100%)]" />
 
-      {/* TEXTURE */}
+      {/* TEXTURE - DESKTOP ONLY */}
       <div
         className="
           pointer-events-none absolute inset-0 -z-10
-          opacity-[0.045]
+          hidden opacity-[0.045]
           [background-image:repeating-linear-gradient(45deg,#ffffff_0px,#ffffff_1px,transparent_1px,transparent_5px)]
+          lg:block
         "
       />
 
@@ -92,122 +166,273 @@ export default function Hero() {
         aria-hidden="true"
         className="
           pointer-events-none absolute
-          -bottom-8 left-[8%]
-          whitespace-nowrap
-          text-[clamp(100px,18vw,280px)]
-          font-black leading-none
-          tracking-[-10px]
-          text-white/[0.035]
-          select-none
+          bottom-3 left-[5%]
+          select-none whitespace-nowrap
+          text-[90px] font-black leading-none
+          tracking-[-5px] text-white/[0.035]
+          sm:text-[140px]
+          lg:-bottom-8 lg:left-[8%]
+          lg:text-[clamp(100px,18vw,280px)]
+          lg:tracking-[-10px]
         "
       >
         CRUNCH
       </span>
 
-      {/* DECORATIVE RING */}
-      <motion.div
-        animate={
-          reducedMotion
-            ? undefined
-            : { rotate: 360 }
-        }
-        transition={{
-          duration: 22,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-        className="
-          pointer-events-none absolute
-          right-[5%] top-[9%]
-          h-[76px] w-[76px]
-          rounded-full
-          border-[9px] border-[#E9AC12]/35
-        "
-      />
-
-      {/* GOLDEN KERNELS */}
-      {kernels.map((kernel, index) => (
-        <motion.span
-          key={index}
-          aria-hidden="true"
-          className="
-            pointer-events-none absolute z-10
-            rounded-[40%]
-            bg-gradient-to-br
-            from-[#FFE27A]
-            via-[#F2B523]
-            to-[#C7780C]
-            shadow-[0_5px_12px_rgba(0,0,0,0.3)]
-          "
-          style={{
-            top: kernel.top,
-            left: kernel.left,
-            width: kernel.size,
-            height: kernel.size * 1.3,
-          }}
-          animate={
-            reducedMotion
-              ? undefined
-              : {
-                  y: [0, -18, 0],
-                  rotate: [-20, 18, -20],
-                }
-          }
+      {/* DECORATIVE RING - DESKTOP ONLY */}
+      {!disableHeavyAnimations && (
+        <motion.div
+          animate={{ rotate: 360 }}
           transition={{
-            duration: 4 + index * 0.6,
-            delay: kernel.delay,
+            duration: 22,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "linear",
           }}
+          className="
+            pointer-events-none absolute
+            right-[5%] top-[9%]
+            hidden h-[76px] w-[76px]
+            rounded-full
+            border-[9px] border-[#E9AC12]/35
+            lg:block
+          "
         />
-      ))}
+      )}
 
-      {/* MAIN CONTAINER */}
+      {/* GOLDEN KERNELS - DESKTOP ONLY */}
+      {!disableHeavyAnimations &&
+        kernels.map((kernel, index) => (
+          <motion.span
+            key={index}
+            aria-hidden="true"
+            className="
+              pointer-events-none absolute z-10
+              hidden rounded-[40%]
+              bg-gradient-to-br
+              from-[#FFE27A]
+              via-[#F2B523]
+              to-[#C7780C]
+              shadow-[0_5px_12px_rgba(0,0,0,0.3)]
+              lg:block
+            "
+            style={{
+              top: kernel.top,
+              left: kernel.left,
+              width: kernel.size,
+              height: kernel.size * 1.3,
+            }}
+            animate={{
+              y: [0, -18, 0],
+              rotate: [-20, 18, -20],
+            }}
+            transition={{
+              duration: 4 + index * 0.6,
+              delay: kernel.delay,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+
+      {/* ======================================
+          MAIN CONTAINER
+      ====================================== */}
+
       <div
         className="
           relative mx-auto flex
-          w-[calc(100%-36px)]
-          max-w-[1400px]
-          flex-col justify-center py-16
-          sm:w-[calc(100%-64px)]
-          lg:min-h-[590px] lg:py-14
+          w-full max-w-[1400px]
+          flex-col
+          px-5 pb-12 pt-12
+          sm:px-8 sm:pb-16 sm:pt-14
+          lg:min-h-[590px]
+          lg:justify-center
+          lg:px-8 lg:py-14
           xl:min-h-[640px]
         "
       >
-        {/* RIGHT ORIGINAL IMAGE */}
+        {/* ======================================
+            LEFT CONTENT
+        ====================================== */}
+
+        <div className="relative z-20 order-1 lg:pointer-events-none">
+
+          {/* EYEBROW */}
+          <motion.p
+            {...contentReveal(0.15)}
+            className="
+              mb-4 max-w-[700px]
+              text-[10px] font-extrabold
+              uppercase tracking-[1.4px]
+              text-[#E66A16]
+              sm:text-[12px]
+              lg:mb-5 lg:tracking-[1.8px]
+            "
+          >
+            Agricultural Commodities • Corn Processing • Frozen Foods
+          </motion.p>
+
+          {/* HEADING */}
+          <motion.h1
+            initial={
+              reducedMotion
+                ? false
+                : {
+                    opacity: 0,
+                    x: disableHeavyAnimations ? 0 : -70,
+                    y: disableHeavyAnimations ? 12 : 0,
+                  }
+            }
+            animate={{
+              opacity: 1,
+              x: 0,
+              y: 0,
+            }}
+            transition={{
+              duration: disableHeavyAnimations ? 0.5 : 0.9,
+              delay: disableHeavyAnimations ? 0 : 0.25,
+              ease,
+            }}
+            className="
+              relative z-30
+              max-w-[1100px]
+              text-[clamp(32px,8.5vw,70px)]
+              font-black uppercase
+              leading-[1.08]
+              tracking-[-1.2px]
+              text-white
+              sm:tracking-[-2px]
+              lg:text-[clamp(40px,5.6vw,70px)]
+              lg:leading-[1.02]
+              lg:tracking-[-2.5px]
+            "
+          >
+            FROM NATURE'S
+            <br />
+            HARVEST TO
+            <br />
+            <span className="text-[#E9AC12]">
+              INDUSTRIAL EXCELLENCE.
+            </span>
+          </motion.h1>
+
+          {/* DESCRIPTION */}
+          <motion.p
+            {...contentReveal(0.45)}
+            className="
+              relative z-30
+              mt-5 max-w-[570px]
+              text-[13px] leading-[1.8]
+              text-white/75
+              sm:text-[15px]
+              lg:mt-6
+            "
+          >
+            Crunch & Crisp India LLP is a manufacturing and
+            agricultural commodities company offering quality
+            corn products, agricultural commodities and frozen
+            food solutions for diverse business and industrial
+            requirements.
+          </motion.p>
+
+          {/* BUTTONS */}
+          <motion.div
+            {...contentReveal(0.6)}
+            className="
+              pointer-events-auto relative z-30
+              mt-7 flex flex-wrap
+              items-center gap-3
+              lg:mt-8
+            "
+          >
+            <Link
+              to="/products"
+              className="
+                group inline-flex min-h-[48px]
+                items-center justify-center gap-2
+                rounded-lg
+                bg-gradient-to-r
+                from-[#E66A16] to-[#E9AC12]
+                px-5 text-[12px]
+                font-extrabold text-white
+                transition-transform duration-200
+                active:scale-[0.98]
+                sm:min-h-[51px]
+                sm:px-6 sm:text-[13px]
+                lg:hover:-translate-y-1
+              "
+            >
+              Explore Our Products
+
+              <ArrowUpRight
+                size={17}
+                className="transition-transform duration-200 lg:group-hover:translate-x-1 lg:group-hover:-translate-y-1"
+              />
+            </Link>
+
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                inline-flex min-h-[48px]
+                items-center justify-center gap-2
+                rounded-lg border border-[#E9AC12]
+                bg-white/5 px-5
+                text-[12px] font-extrabold
+                text-white
+                transition-colors duration-200
+                active:scale-[0.98]
+                sm:min-h-[51px]
+                sm:px-6 sm:text-[13px]
+                lg:hover:bg-[#E9AC12]
+                lg:hover:text-[#202A38]
+              "
+            >
+              Get a Bulk Quote
+              <MessageCircle size={17} />
+            </a>
+          </motion.div>
+        </div>
+
+        {/* ======================================
+            RIGHT HERO IMAGE
+        ====================================== */}
+
         <div
           onPointerMove={handleMouseMove}
           onPointerLeave={resetMouse}
           className="
             relative order-2
-            mt-4 flex h-[310px]
+            mt-5 flex h-[250px]
             items-center justify-center
-            sm:h-[380px]
+            sm:h-[350px]
             lg:absolute lg:inset-y-0
             lg:right-[-5%]
             lg:order-none lg:mt-0
             lg:h-full lg:w-[63%]
           "
           style={{
-            perspective: "1200px",
+            perspective: disableHeavyAnimations
+              ? "none"
+              : "1200px",
           }}
         >
-          {/* BACK GLOW */}
+          {/* BACK GLOW - DESKTOP ONLY */}
           <div
             className="
               pointer-events-none absolute
-              h-[260px] w-[260px]
+              hidden h-[380px] w-[380px]
               rounded-full bg-[#E9AC12]/12
               blur-[75px]
-              sm:h-[380px] sm:w-[380px]
-              lg:h-[480px] lg:w-[480px]
+              lg:block lg:h-[480px] lg:w-[480px]
             "
           />
 
-          {/* FALL FROM TOP */}
+          {/* DESKTOP FALL ANIMATION */}
           <motion.div
             initial={
-              reducedMotion
+              disableHeavyAnimations
                 ? false
                 : {
                     y: -750,
@@ -225,7 +450,7 @@ export default function Hero() {
               opacity: 1,
             }}
             transition={
-              reducedMotion
+              disableHeavyAnimations
                 ? { duration: 0 }
                 : {
                     y: {
@@ -258,25 +483,31 @@ export default function Hero() {
               items-center justify-center
             "
             style={{
-              transformStyle: "preserve-3d",
+              transformStyle: disableHeavyAnimations
+                ? "flat"
+                : "preserve-3d",
             }}
           >
-            {/* MOUSE 3D TILT */}
+            {/* MOUSE TILT */}
             <motion.div
-              style={{
-                rotateX,
-                rotateY,
-                transformStyle: "preserve-3d",
-              }}
+              style={
+                disableHeavyAnimations
+                  ? {}
+                  : {
+                      rotateX,
+                      rotateY,
+                      transformStyle: "preserve-3d",
+                    }
+              }
               className="
                 relative flex h-full w-full
                 items-center justify-center
               "
             >
-              {/* FLOAT AFTER LANDING */}
+              {/* FLOATING IMAGE */}
               <motion.div
                 animate={
-                  landed && !reducedMotion
+                  landed && !disableHeavyAnimations
                     ? {
                         y: [0, -12, 0],
                         rotateZ: [0, 1.5, -1.5, 0],
@@ -293,20 +524,20 @@ export default function Hero() {
                   items-center justify-center
                 "
               >
-                {/* ORIGINAL HERO IMAGE */}
                 <img
                   src="/hero.png"
                   alt="Premium golden corn products"
                   fetchPriority="high"
+                  decoding="async"
                   className="
                     relative z-10
-                    max-h-[360px] w-full
+                    max-h-[260px] w-full
                     object-contain
-                    drop-shadow-[0_30px_35px_rgba(0,0,0,0.45)]
-                    sm:max-h-[440px]
+                    sm:max-h-[360px]
                     lg:ml-40
                     lg:max-h-[620px]
                     lg:w-[110%]
+                    lg:drop-shadow-[0_30px_35px_rgba(0,0,0,0.45)]
                   "
                 />
               </motion.div>
@@ -316,7 +547,7 @@ export default function Hero() {
           {/* GOLDEN CORN TEXT */}
           <motion.span
             initial={
-              reducedMotion
+              disableHeavyAnimations
                 ? false
                 : {
                     opacity: 0,
@@ -330,180 +561,22 @@ export default function Hero() {
               rotate: -12,
             }}
             transition={{
-              duration: 0.8,
-              delay: 1.2,
+              duration: disableHeavyAnimations ? 0 : 0.8,
+              delay: disableHeavyAnimations ? 0 : 1.2,
             }}
             className="
               pointer-events-none absolute
-              bottom-[12%] right-[3%] z-20
-              text-[clamp(26px,3.5vw,50px)]
+              bottom-[3%] right-[2%] z-20
+              text-[clamp(23px,5vw,50px)]
               font-black italic
-              tracking-[-2px]
+              tracking-[-1px]
               text-[#E9AC12]
-              drop-shadow-[0_5px_12px_rgba(0,0,0,0.35)]
+              lg:bottom-[12%] lg:right-[3%]
+              lg:tracking-[-2px]
             "
           >
             GOLDEN CORN
           </motion.span>
-        </div>
-
-        {/* LEFT CONTENT */}
-        <div className="relative z-20 order-1 lg:order-none lg:pointer-events-none">
-          {/* EYEBROW */}
-          <motion.p
-            initial={
-              reducedMotion
-                ? false
-                : { opacity: 0, y: 20 }
-            }
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.65,
-              delay: 0.15,
-            }}
-            className="
-              mb-5 max-w-[700px]
-              text-[11px] font-extrabold
-              uppercase tracking-[1.8px]
-              text-[#E66A16]
-              sm:text-[12px]
-            "
-          >
-            Agricultural Commodities • Corn Processing • Frozen Foods
-          </motion.p>
-
-          {/* HEADING */}
-          <motion.h1
-            initial={
-              reducedMotion
-                ? false
-                : { opacity: 0, x: -70 }
-            }
-            animate={{
-              opacity: 1,
-              x: 0,
-            }}
-            transition={{
-              duration: 0.9,
-              delay: 0.25,
-              ease,
-            }}
-            className="
-              relative z-30
-              max-w-[1100px]
-              text-[clamp(40px,5.6vw,70px)]
-              font-black uppercase
-              leading-[1.02]
-              tracking-[-2.5px]
-              text-white
-              sm:tracking-[-3px]
-            "
-          >
-            FROM NATURE'S
-            <br />
-            HARVEST TO
-            <br />
-            <span className="text-[#E9AC12]">
-              INDUSTRIAL EXCELLENCE.
-            </span>
-          </motion.h1>
-
-          {/* DESCRIPTION */}
-          <motion.p
-            initial={
-              reducedMotion
-                ? false
-                : { opacity: 0, y: 25 }
-            }
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.7,
-              delay: 0.45,
-            }}
-            className="
-              relative z-30
-              mt-6 max-w-[570px]
-              text-[14px] leading-[1.8]
-              text-white/75
-              sm:text-[15px]
-            "
-          >
-            Crunch & Crisp India LLP is a manufacturing and
-            agricultural commodities company offering quality
-            corn products, agricultural commodities and frozen
-            food solutions for diverse business and industrial
-            requirements.
-          </motion.p>
-
-          {/* BUTTONS */}
-          <motion.div
-            initial={
-              reducedMotion
-                ? false
-                : { opacity: 0, y: 25 }
-            }
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.7,
-              delay: 0.6,
-            }}
-            className="
-              pointer-events-auto relative z-30
-              mt-8 flex flex-wrap
-              items-center gap-3
-            "
-          >
-            <Link
-              to="/products"
-              className="
-                group inline-flex min-h-[51px]
-                items-center justify-center gap-3
-                rounded-lg
-                bg-gradient-to-r
-                from-[#E66A16] to-[#E9AC12]
-                px-6 text-[13px]
-                font-extrabold text-white
-                transition-transform duration-300
-                hover:-translate-y-1
-              "
-            >
-              Explore Our Products
-
-              <ArrowUpRight
-                size={18}
-                className="
-                  transition-transform duration-300
-                  group-hover:translate-x-1
-                  group-hover:-translate-y-1
-                "
-              />
-            </Link>
-
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
-                inline-flex min-h-[51px]
-                items-center justify-center gap-3
-                rounded-lg border border-[#E9AC12]
-                bg-white/5 px-6
-                text-[13px] font-extrabold
-                text-white
-                backdrop-blur-sm
-                transition-all duration-300
-                hover:-translate-y-1
-                hover:bg-[#E9AC12]
-                hover:text-[#202A38]
-              "
-            >
-              Get a Bulk Quote
-              <MessageCircle size={18} />
-            </a>
-          </motion.div>
         </div>
       </div>
 
