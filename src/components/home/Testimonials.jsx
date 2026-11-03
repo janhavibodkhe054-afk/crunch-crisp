@@ -3,13 +3,16 @@ import React, {
   useEffect,
   useRef,
   useState,
+  useCallback,
 } from "react";
 
 import {
   motion,
+  AnimatePresence,
   useMotionValue,
   useSpring,
   useReducedMotion,
+  useInView,
 } from "framer-motion";
 
 import {
@@ -21,14 +24,10 @@ import {
   Sparkles,
 } from "lucide-react";
 
-/* ==========================================
-   CRUNCH & CRISP INDIA LLP
-   PREMIUM 3D TESTIMONIALS CAROUSEL
-
+/* ======================================
+   TESTIMONIAL DATA
    DEMO REVIEWS ONLY
-   Replace with verified customer feedback
-   before publishing.
-========================================== */
+====================================== */
 
 const testimonials = [
   {
@@ -100,38 +99,136 @@ const testimonials = [
 const AUTO_DELAY = 3200;
 const ease = [0.22, 1, 0.36, 1];
 
-/* ==========================================
-   3D TESTIMONIAL CARD
-========================================== */
+const wrap = (index) =>
+  ((index % testimonials.length) + testimonials.length) %
+  testimonials.length;
 
-function TestimonialCard({
+/* ======================================
+   RESPONSIVE DETECTION
+====================================== */
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 1023px)").matches
+      : false
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)");
+
+    const update = () => setIsMobile(media.matches);
+
+    media.addEventListener("change", update);
+
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
+
+/* ======================================
+   REVIEW CONTENT
+====================================== */
+
+function ReviewContent({ item, isMobile = false }) {
+  return (
+    <div
+      className={`
+        relative flex h-full flex-col
+        justify-between overflow-hidden
+        rounded-[20px] border
+        bg-white p-5
+        sm:p-7 lg:rounded-[22px] lg:p-8
+        ${
+          isMobile
+            ? "border-[#F0D8BD] shadow-[0_8px_25px_rgba(32,42,56,0.08)]"
+            : "border-[#F0D8BD] shadow-[0_20px_55px_rgba(32,42,56,0.13)]"
+        }
+      `}
+    >
+      {/* TOP ACCENT */}
+      <div className="absolute inset-x-0 top-0 h-[4px] bg-gradient-to-r from-[#E66A16] via-[#F4B51C] to-[#E9AC12]" />
+
+      {/* DESKTOP BACKGROUND DECORATION */}
+      {!isMobile && (
+        <div className="pointer-events-none absolute -right-16 -top-16 h-[180px] w-[180px] rounded-full bg-[#FFF5E9] blur-[45px]" />
+      )}
+
+      {/* REVIEW */}
+      <div className="relative">
+        <div className="flex items-start justify-between gap-3">
+          <Quote
+            size={isMobile ? 30 : 36}
+            strokeWidth={1.3}
+            className="shrink-0 text-[#E9AC12]"
+          />
+
+          <span className="rounded-full bg-[#FFF3E5] px-3 py-1.5 text-[9px] font-extrabold tracking-[1px] text-[#D77D24]">
+            {item.category}
+          </span>
+        </div>
+
+        <blockquote
+          className="
+            mt-5 text-[14px] font-semibold
+            leading-[1.75] text-[#344252]
+            sm:text-[16px]
+            lg:mt-6 lg:text-[18px]
+            lg:leading-[1.8]
+          "
+        >
+          “{item.quote}”
+        </blockquote>
+      </div>
+
+      {/* CUSTOMER */}
+      <div className="relative mt-6 flex items-center gap-3 border-t border-[#F1EBE4] pt-5">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#E66A16] to-[#F4B51C] text-[12px] font-black text-white">
+          {item.initials}
+        </div>
+
+        <h4 className="text-[14px] font-extrabold text-[#202A38]">
+          {item.name}
+        </h4>
+      </div>
+    </div>
+  );
+}
+
+/* ======================================
+   DESKTOP 3D CARD
+====================================== */
+
+function DesktopCard({
   item,
   position,
   onClick,
   reducedMotion,
 }) {
-  const isActive = position === 0;
   const cardRef = useRef(null);
 
-  const rotateX = useMotionValue(0);
-  const rotateY = useMotionValue(0);
+  const isActive = position === 0;
 
-  const smoothX = useSpring(rotateX, {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(mouseX, {
     stiffness: 130,
     damping: 24,
   });
 
-  const smoothY = useSpring(rotateY, {
+  const rotateY = useSpring(mouseY, {
     stiffness: 130,
     damping: 24,
   });
 
-  const handleMove = (event) => {
+  const handlePointerMove = (event) => {
     if (
       !isActive ||
       reducedMotion ||
-      !cardRef.current ||
-      event.pointerType !== "mouse"
+      event.pointerType !== "mouse" ||
+      !cardRef.current
     ) {
       return;
     }
@@ -144,13 +241,13 @@ function TestimonialCard({
     const y =
       (event.clientY - rect.top) / rect.height - 0.5;
 
-    rotateX.set(-y * 5);
-    rotateY.set(x * 6);
+    mouseX.set(-y * 5);
+    mouseY.set(x * 6);
   };
 
   const resetTilt = () => {
-    rotateX.set(0);
-    rotateY.set(0);
+    mouseX.set(0);
+    mouseY.set(0);
   };
 
   const getPosition = () => {
@@ -198,7 +295,7 @@ function TestimonialCard({
   return (
     <motion.div
       ref={cardRef}
-      onPointerMove={handleMove}
+      onPointerMove={handlePointerMove}
       onPointerLeave={resetTilt}
       onClick={onClick}
       initial={false}
@@ -210,7 +307,7 @@ function TestimonialCard({
         z: reducedMotion ? 0 : target.z,
       }}
       transition={{
-        duration: reducedMotion ? 0.2 : 0.7,
+        duration: reducedMotion ? 0 : 0.65,
         ease,
       }}
       style={{
@@ -222,137 +319,173 @@ function TestimonialCard({
         marginLeft: "calc(min(520px, 78vw) / -2)",
         marginTop: "-175px",
         transformStyle: "preserve-3d",
-        zIndex: isActive
-          ? 20
-          : 10 - Math.abs(position),
+        zIndex: isActive ? 20 : 10 - Math.abs(position),
         pointerEvents:
           Math.abs(position) > 1 ? "none" : "auto",
         cursor: isActive ? "default" : "pointer",
       }}
-      className="max-w-[520px]"
     >
-      {/* INNER 3D CARD */}
       <motion.div
         style={{
-          rotateX: smoothX,
-          rotateY: smoothY,
+          rotateX,
+          rotateY,
           transformStyle: "preserve-3d",
         }}
-        className={`relative flex h-[350px] flex-col justify-between overflow-hidden rounded-[22px] border bg-white p-6 transition-colors sm:p-8 ${
-          isActive
-            ? "border-[#F0D8BD] shadow-[0_20px_55px_rgba(32,42,56,0.13)]"
-            : "border-[#EAE2D9] shadow-[0_12px_30px_rgba(32,42,56,0.07)]"
-        }`}
+        className="h-full w-full"
       >
-        {/* TOP GOLDEN ACCENT */}
-        <div className="absolute inset-x-0 top-0 h-[4px] bg-gradient-to-r from-[#E66A16] via-[#F4B51C] to-[#E9AC12]" />
-
-        {/* BACKGROUND DECORATION */}
-        <div className="pointer-events-none absolute -right-16 -top-16 h-[180px] w-[180px] rounded-full bg-[#FFF5E9] blur-[45px]" />
-
-        {/* REVIEW CONTENT */}
-        <div className="relative">
-          <div className="flex items-start justify-between gap-3">
-            <Quote
-              size={36}
-              strokeWidth={1.3}
-              className="shrink-0 text-[#E9AC12]"
-            />
-
-            <span className="rounded-full bg-[#FFF3E5] px-3 py-1.5 text-[9px] font-extrabold tracking-[1px] text-[#D77D24]">
-              {item.category}
-            </span>
-          </div>
-
-          <blockquote className="mt-6 line-clamp-6 text-[clamp(14px,1.45vw,19px)] font-semibold leading-[1.8] text-[#344252]">
-            “{item.quote}”
-          </blockquote>
-        </div>
-
-        {/* CUSTOMER NAME - NO ROLE */}
-        <div className="relative mt-6 flex items-center gap-3 border-t border-[#F1EBE4] pt-5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#E66A16] to-[#F4B51C] text-[12px] font-black text-white">
-            {item.initials}
-          </div>
-
-          <div>
-            <h4 className="text-[14px] font-extrabold text-[#202A38]">
-              {item.name}
-            </h4>
-          </div>
-        </div>
+        <ReviewContent item={item} />
       </motion.div>
     </motion.div>
   );
 }
 
-/* ==========================================
+/* ======================================
    MAIN TESTIMONIAL SECTION
-========================================== */
+====================================== */
 
 export default function Testimonials() {
+  const sectionRef = useRef(null);
+  const touchStartX = useRef(null);
+
+  const isMobile = useIsMobile();
+  const reducedMotion = useReducedMotion();
+
+  const isInView = useInView(sectionRef, {
+    amount: 0.15,
+  });
+
   const [active, setActive] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [hovered, setHovered] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
+
+  const [direction, setDirection] = useState(1);
   const [cycle, setCycle] = useState(0);
 
-  const reducedMotion = useReducedMotion();
-
   const shouldPlay =
-    playing && !hovered && !reducedMotion;
+    playing &&
+    !hovered &&
+    pageVisible &&
+    isInView;
+
+  /* ======================================
+     PAGE VISIBILITY
+  ====================================== */
+
+  useEffect(() => {
+    const update = () => {
+      setPageVisible(!document.hidden);
+    };
+
+    update();
+
+    document.addEventListener("visibilitychange", update);
+
+    return () => {
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
+
+  /* ======================================
+     NAVIGATION
+  ====================================== */
+
+  const goTo = useCallback((index) => {
+    setActive((prev) => {
+      const nextIndex = wrap(index);
+
+      setDirection(nextIndex >= prev ? 1 : -1);
+
+      return nextIndex;
+    });
+
+    setCycle((prev) => prev + 1);
+  }, []);
+
+  const next = useCallback(() => {
+    setDirection(1);
+    setActive((prev) => wrap(prev + 1));
+    setCycle((prev) => prev + 1);
+  }, []);
+
+  const previous = useCallback(() => {
+    setDirection(-1);
+    setActive((prev) => wrap(prev - 1));
+    setCycle((prev) => prev + 1);
+  }, []);
+
+  /* ======================================
+     AUTOPLAY
+  ====================================== */
 
   useEffect(() => {
     if (!shouldPlay || testimonials.length <= 1) {
       return;
     }
 
-    const timer = setTimeout(() => {
-      setActive(
-        (prev) => (prev + 1) % testimonials.length
-      );
-
+    const timer = window.setInterval(() => {
+      setDirection(1);
+      setActive((prev) => wrap(prev + 1));
       setCycle((prev) => prev + 1);
     }, AUTO_DELAY);
 
-    return () => clearTimeout(timer);
-  }, [active, cycle, shouldPlay]);
+    return () => window.clearInterval(timer);
+  }, [shouldPlay]);
 
-  const goTo = (index) => {
-    setActive(
-      (index + testimonials.length) %
-        testimonials.length
-    );
+  /* ======================================
+     TOUCH SWIPE
+  ====================================== */
 
-    setCycle((prev) => prev + 1);
+  const handleTouchStart = (event) => {
+    touchStartX.current = event.touches[0].clientX;
   };
 
-  const next = () => goTo(active + 1);
-  const previous = () => goTo(active - 1);
+  const handleTouchEnd = (event) => {
+    if (touchStartX.current === null) return;
+
+    const difference =
+      touchStartX.current -
+      event.changedTouches[0].clientX;
+
+    if (Math.abs(difference) > 50) {
+      if (difference > 0) {
+        next();
+      } else {
+        previous();
+      }
+    }
+
+    touchStartX.current = null;
+  };
 
   const visibleCards = [-1, 0, 1].map((offset) => ({
-    item:
-      testimonials[
-        (active + offset + testimonials.length) %
-          testimonials.length
-      ],
+    item: testimonials[wrap(active + offset)],
     position: offset,
   }));
 
   return (
     <section
+      ref={sectionRef}
       id="testimonials"
-      className="relative overflow-hidden bg-white py-14 sm:py-16 lg:py-20"
+      className="
+        relative overflow-hidden
+        bg-white
+        py-12 sm:py-16 lg:py-20
+      "
     >
       <div className="mx-auto max-w-[1400px] px-4 sm:px-8 lg:px-12">
 
-        {/* SECTION HEADER */}
+        {/* ======================================
+            SECTION HEADER
+        ====================================== */}
+
         <motion.div
           initial={
             reducedMotion
               ? false
               : {
                   opacity: 0,
-                  y: 25,
+                  y: 20,
                 }
           }
           whileInView={{
@@ -360,14 +493,14 @@ export default function Testimonials() {
             y: 0,
           }}
           viewport={{
-            once: false,
-            amount: 0.2,
+            once: true,
+            amount: 0.15,
           }}
           transition={{
-            duration: 0.6,
+            duration: 0.5,
             ease,
           }}
-          className="mx-auto mb-8 max-w-[700px] text-center"
+          className="mx-auto mb-7 max-w-[700px] text-center lg:mb-8"
         >
           <div className="mb-3 flex items-center justify-center gap-3">
             <span className="h-[2px] w-7 bg-[#E66A16]" />
@@ -392,9 +525,14 @@ export default function Testimonials() {
           </p>
         </motion.div>
 
-        {/* 3D CAROUSEL */}
+        {/* ======================================
+            CAROUSEL WRAPPER
+        ====================================== */}
+
         <div
-          onMouseEnter={() => setHovered(true)}
+          onMouseEnter={() => {
+            if (!isMobile) setHovered(true);
+          }}
           onMouseLeave={() => setHovered(false)}
           onFocusCapture={() => setHovered(true)}
           onBlurCapture={(event) => {
@@ -406,63 +544,134 @@ export default function Testimonials() {
               setHovered(false);
             }
           }}
-          className="relative overflow-hidden rounded-[24px] border border-[#F1E8DD] bg-gradient-to-br from-[#FFFCF8] via-white to-[#FFF7EC] px-3 py-8 sm:px-6"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="
+            relative overflow-hidden
+            rounded-[20px]
+            border border-[#F1E8DD]
+            bg-gradient-to-br
+            from-[#FFFCF8]
+            via-white
+            to-[#FFF7EC]
+            px-3 py-6
+            sm:rounded-[24px]
+            sm:px-6 sm:py-8
+          "
         >
           {/* TOP BAR */}
           <div className="relative z-30 mx-auto mb-5 flex max-w-[1000px] items-center justify-between gap-3 px-2">
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
               <Sparkles
                 size={15}
-                className="text-[#E66A16]"
+                className="shrink-0 text-[#E66A16]"
               />
 
-              <span className="text-[10px] font-extrabold uppercase tracking-[1px] text-[#C58A34]">
+              <span className="truncate text-[9px] font-extrabold uppercase tracking-[0.7px] text-[#C58A34] sm:text-[10px] sm:tracking-[1px]">
                 CRUNCH & CRISP INDIA LLP
               </span>
             </div>
 
-            <span className="text-[12px] font-extrabold text-[#8B96A1]">
+            <span className="shrink-0 text-[12px] font-extrabold text-[#8B96A1]">
               {String(active + 1).padStart(2, "0")}
-
-              <span className="mx-2 text-[#CCD2D8]">
-                /
-              </span>
-
-              {String(testimonials.length).padStart(
-                2,
-                "0"
-              )}
+              <span className="mx-2 text-[#CCD2D8]">/</span>
+              {String(testimonials.length).padStart(2, "0")}
             </span>
           </div>
 
-          {/* 3D STAGE */}
-          <div
-            className="relative mx-auto h-[380px] w-full max-w-[1100px]"
-            style={{
-              perspective: "1200px",
-              perspectiveOrigin: "50% 50%",
-            }}
-          >
-            {visibleCards.map(({ item, position }) => (
-              <TestimonialCard
-                key={item.id}
-                item={item}
-                position={position}
-                reducedMotion={reducedMotion}
-                onClick={() => {
-                  if (position === -1) previous();
-                  if (position === 1) next();
-                }}
-              />
-            ))}
-          </div>
+          {/* ======================================
+              MOBILE SLIDER
+          ====================================== */}
 
-          {/* AUTOPLAY PROGRESS */}
-          <div className="relative z-30 mx-auto mt-2 max-w-[600px]">
+          {isMobile && (
+            <div className="relative mx-auto h-[315px] w-full max-w-[560px] sm:h-[335px]">
+              <AnimatePresence
+                mode="wait"
+                initial={false}
+                custom={direction}
+              >
+                <motion.div
+                  key={testimonials[active].id}
+                  custom={direction}
+                  initial={(dir) =>
+                    reducedMotion
+                      ? {
+                          opacity: 1,
+                          x: 0,
+                        }
+                      : {
+                          opacity: 0,
+                          x: dir > 0 ? 35 : -35,
+                        }
+                  }
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                  }}
+                  exit={(dir) =>
+                    reducedMotion
+                      ? {
+                          opacity: 1,
+                          x: 0,
+                        }
+                      : {
+                          opacity: 0,
+                          x: dir > 0 ? -35 : 35,
+                        }
+                  }
+                  transition={{
+                    duration: reducedMotion ? 0 : 0.22,
+                    ease,
+                  }}
+                  className="absolute inset-0"
+                >
+                  <ReviewContent
+                    item={testimonials[active]}
+                    isMobile
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* ======================================
+              DESKTOP 3D CAROUSEL
+          ====================================== */}
+
+          {!isMobile && (
+            <div
+              className="relative mx-auto h-[380px] w-full max-w-[1100px]"
+              style={{
+                perspective: "1200px",
+                perspectiveOrigin: "50% 50%",
+              }}
+            >
+              {visibleCards.map(({ item, position }) => (
+                <DesktopCard
+                  key={item.id}
+                  item={item}
+                  position={position}
+                  reducedMotion={reducedMotion}
+                  onClick={() => {
+                    if (position === -1) previous();
+                    if (position === 1) next();
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* ======================================
+              AUTOPLAY PROGRESS
+          ====================================== */}
+
+          <div className="relative z-30 mx-auto mt-4 max-w-[600px]">
             <div className="h-[3px] overflow-hidden rounded-full bg-[#EFE3D4]">
               <motion.div
-                key={`${active}-${cycle}-${shouldPlay}`}
-                initial={{ scaleX: 0 }}
+                key={`${cycle}-${shouldPlay}`}
+                initial={{
+                  scaleX: 0,
+                }}
                 animate={{
                   scaleX: shouldPlay ? 1 : 0,
                 }}
@@ -477,23 +686,26 @@ export default function Testimonials() {
             </div>
           </div>
 
-          {/* CAROUSEL CONTROLS */}
+          {/* ======================================
+              CONTROLS
+          ====================================== */}
+
           <div className="relative z-30 mx-auto mt-6 flex max-w-[1000px] flex-wrap items-center justify-between gap-4">
 
-            {/* DOT NAVIGATION */}
+            {/* DOTS */}
             <div className="flex flex-wrap items-center gap-2">
               {testimonials.map((item, index) => (
                 <button
                   key={item.id}
                   type="button"
+                  onClick={() => goTo(index)}
                   aria-label={`Show testimonial ${index + 1}`}
                   aria-current={
                     active === index
                       ? "true"
                       : undefined
                   }
-                  onClick={() => goTo(index)}
-                  className={`h-[7px] rounded-full transition-all duration-300 ${
+                  className={`h-[7px] rounded-full transition-[width,background-color] duration-200 ${
                     active === index
                       ? "w-8 bg-[#E66A16]"
                       : "w-[7px] bg-[#D7DDE2] hover:bg-[#E9AC12]"
@@ -506,9 +718,7 @@ export default function Testimonials() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() =>
-                  setPlaying((prev) => !prev)
-                }
+                onClick={() => setPlaying((prev) => !prev)}
                 aria-label={
                   playing
                     ? "Pause autoplay"
@@ -544,7 +754,7 @@ export default function Testimonials() {
           </div>
         </div>
 
-        {/* DEMO CONTENT NOTICE */}
+        {/* DEMO NOTICE */}
         <p className="mt-4 text-center text-[11px] text-[#9AA4AF]">
           Sample testimonials for design preview only.
         </p>
