@@ -1,12 +1,6 @@
-
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  Package,
-  Boxes,
-  ClipboardList,
-  ArrowUpRight,
-} from "lucide-react";
+import { Package, Boxes, ClipboardList, ArrowUpRight } from "lucide-react";
 
 const MAIN_IMAGE = "/img1.webp";
 const SECONDARY_IMAGE = "/logo.jpeg";
@@ -24,7 +18,7 @@ Business Name:
 Location:`;
 
 const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  whatsappMessage
+  whatsappMessage,
 )}`;
 
 const considerations = [
@@ -64,15 +58,13 @@ export default function PackagingBulkSupply() {
         <div
           className="absolute inset-0 opacity-[0.025]"
           style={{
-            backgroundImage:
-              "radial-gradient(#202A38 1px, transparent 1px)",
+            backgroundImage: "radial-gradient(#202A38 1px, transparent 1px)",
             backgroundSize: "26px 26px",
           }}
         />
       </div>
 
       <div className="relative mx-auto grid max-w-[1350px] grid-cols-1 items-center gap-14 px-5 sm:px-8 lg:grid-cols-2 lg:gap-20 lg:px-12">
-
         {/* LEFT IMAGE SHOWCASE */}
         <motion.div
           initial={{
@@ -99,11 +91,7 @@ export default function PackagingBulkSupply() {
               src={MAIN_IMAGE}
               alt="Agricultural commodity packaging"
               loading="lazy"
-              whileHover={
-                reduceMotion
-                  ? undefined
-                  : { scale: 1.07 }
-              }
+              whileHover={reduceMotion ? undefined : { scale: 1.07 }}
               transition={{ duration: 0.7, ease }}
               className="h-full w-full object-cover"
             />
@@ -121,35 +109,44 @@ export default function PackagingBulkSupply() {
             </div>
           </div>
 
-          {/* SECONDARY IMAGE */}
+          {/* SECONDARY IMAGE — MOBILE FIX */}
           <motion.div
-            animate={
-              reduceMotion
-                ? undefined
-                : { y: [0, -8, 0] }
-            }
+            animate={reduceMotion ? undefined : { y: [0, -8, 0] }}
             transition={{
               duration: 5,
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="absolute bottom-0 right-0 w-[43%] overflow-hidden rounded-[17px] border-[5px] border-[#F5F6F8] bg-white shadow-[0_15px_40px_rgba(32,42,56,0.2)]"
+            className="
+    absolute bottom-0 right-0
+    w-[48%] sm:w-[43%]
+    overflow-hidden
+    rounded-[17px]
+    border-[4px] sm:border-[5px]
+    border-[#F5F6F8]
+    bg-white
+    shadow-[0_15px_40px_rgba(32,42,56,0.2)]
+  "
           >
             <img
               src={SECONDARY_IMAGE}
-              alt="Packaging detail"
+              alt="Crunch & Crisp India LLP Logo"
               loading="lazy"
-              className="h-[130px] w-full object-cover sm:h-[165px]"
+              decoding="async"
+              className="
+      h-[115px] w-full
+      object-contain
+      p-2
+      sm:h-[165px]
+      sm:p-0
+      sm:object-cover
+    "
             />
           </motion.div>
 
           {/* SMALL FLOATING LABEL */}
           <motion.div
-            animate={
-              reduceMotion
-                ? undefined
-                : { y: [0, 6, 0] }
-            }
+            animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
             transition={{
               duration: 4,
               repeat: Infinity,
@@ -206,8 +203,8 @@ export default function PackagingBulkSupply() {
 
           {/* DESCRIPTION */}
           <p className="mt-6 max-w-[550px] text-[14px] leading-[1.95] text-[#73808D] sm:text-[15px]">
-            Packaging requirements may vary according to product
-            type, order quantity and customer specifications.
+            Packaging requirements may vary according to product type, order
+            quantity and customer specifications.
           </p>
 
           {/* CONSIDERATIONS */}
@@ -257,18 +254,11 @@ export default function PackagingBulkSupply() {
             href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
-            whileHover={
-              reduceMotion
-                ? undefined
-                : { y: -4, scale: 1.02 }
-            }
-            whileTap={
-              reduceMotion ? undefined : { scale: 0.97 }
-            }
+            whileHover={reduceMotion ? undefined : { y: -4, scale: 1.02 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.97 }}
             className="group mt-8 inline-flex items-center gap-3 rounded-lg bg-[#E66A16] px-7 py-4 text-[12px] font-extrabold text-white shadow-[0_10px_30px_rgba(230,106,22,0.2)] transition-colors duration-300 hover:bg-[#202A38]"
           >
             Discuss Packaging Requirements
-
             <ArrowUpRight
               size={18}
               className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
