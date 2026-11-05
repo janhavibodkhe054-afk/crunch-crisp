@@ -6,13 +6,14 @@ import "aos/dist/aos.css";
 
 import {
   ArrowUpRight,
-  ArrowRight,
   PhoneCall,
   MessageCircle,
   Wheat,
   Package,
   Snowflake,
   MoveUpRight,
+  CookingPot,
+  Sprout,
 } from "lucide-react";
 
 const BACKGROUND_IMAGE = "/corn.jpg";
@@ -22,7 +23,7 @@ const EASE = [0.22, 1, 0.36, 1];
 const whatsappUrl =
   "https://wa.me/918983973799?text=" +
   encodeURIComponent(
-    "Hello Crunch & Crisp India LLP, I would like to enquire about your products."
+    "Hello Crunch & Crisp India LLP, I would like to enquire about your Corn Processing Products, Agricultural Commodities, Premium Basmati Rice, Turmeric, Indian Spices and Frozen Foods. Please share product details and bulk supply information."
   );
 
 const categories = [
@@ -30,16 +31,28 @@ const categories = [
     no: "01",
     icon: Wheat,
     title: "Corn Processing",
-    subtitle: "Quality Corn Products",
+    subtitle: "Corn-Based Products",
   },
   {
     no: "02",
-    icon: Package,
+    icon: Sprout,
     title: "Agri Commodities",
     subtitle: "Agricultural Supply",
   },
   {
     no: "03",
+    icon: Package,
+    title: "Basmati Rice",
+    subtitle: "Premium Rice Supply",
+  },
+  {
+    no: "04",
+    icon: CookingPot,
+    title: "Indian Spices",
+    subtitle: "Turmeric & Spices",
+  },
+  {
+    no: "05",
     icon: Snowflake,
     title: "Frozen Foods",
     subtitle: "Frozen Food Solutions",
@@ -68,17 +81,19 @@ export default function ContactHero() {
   }, []);
 
   const reveal = (delay = 0, y = 25) => ({
-    initial: {
-      opacity: 0,
-      y: reduceMotion ? 0 : y,
-    },
+    initial: reduceMotion
+      ? false
+      : {
+          opacity: 0,
+          y,
+        },
     animate: {
       opacity: 1,
       y: 0,
     },
     transition: {
-      duration: 0.9,
-      delay,
+      duration: reduceMotion ? 0 : 0.9,
+      delay: reduceMotion ? 0 : delay,
       ease: EASE,
     },
   });
@@ -91,20 +106,21 @@ export default function ContactHero() {
       {/* ==================================
           CINEMATIC IMAGE BACKGROUND
       ================================== */}
+
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
 
         {/* MAIN IMAGE */}
         <motion.div
           initial={{
             scale: reduceMotion ? 1 : 1.13,
-            opacity: 0.6,
+            opacity: reduceMotion ? 1 : 0.6,
           }}
           animate={{
             scale: 1,
             opacity: 1,
           }}
           transition={{
-            duration: 1.8,
+            duration: reduceMotion ? 0 : 1.8,
             ease: EASE,
           }}
           className="absolute inset-0 bg-cover bg-center transition-transform duration-[1600ms] ease-out group-hover/hero:scale-[1.035]"
@@ -159,6 +175,7 @@ export default function ContactHero() {
       {/* ==================================
           MAIN HERO CONTENT
       ================================== */}
+
       <div className="relative mx-auto flex min-h-[490px] max-w-[1450px] flex-col justify-center px-5 pb-36 pt-16 sm:min-h-[530px] sm:px-8 sm:pb-38 lg:min-h-[570px] lg:px-12 lg:pb-40 lg:pt-20">
 
         <div className="relative z-10 max-w-[820px]">
@@ -189,14 +206,16 @@ export default function ContactHero() {
             </span>
           </motion.h1>
 
-          {/* DESCRIPTION */}
+          {/* UPDATED DESCRIPTION */}
           <motion.p
             {...reveal(0.35, 25)}
-            className="mt-6 max-w-[590px] border-l-2 border-[#E9AC12]/80 pl-5 text-[14px] leading-[1.95] text-[#E0E6EB] sm:text-[15px]"
+            className="mt-6 max-w-[650px] border-l-2 border-[#E9AC12]/80 pl-5 text-[14px] leading-[1.95] text-[#E0E6EB] sm:text-[15px]"
           >
-            Looking for corn products, agricultural commodities
-            or frozen foods? Get in touch with our team for
-            product information and business enquiries.
+            Looking for Corn Processing Products, Agricultural
+            Commodities, Premium Basmati Rice, Turmeric,
+            Turmeric Powder, Indian Spices or Frozen Foods?
+            Connect with our team for product information,
+            bulk enquiries and commercial supply requirements.
           </motion.p>
 
           {/* CTA BUTTONS */}
@@ -208,7 +227,7 @@ export default function ContactHero() {
               href="#contact-form"
               className="group inline-flex items-center justify-center gap-3 rounded-lg bg-gradient-to-r from-[#E66A16] to-[#E9AC12] px-6 py-3.5 text-[13px] font-extrabold text-white shadow-[0_12px_30px_rgba(230,106,22,0.22)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(230,106,22,0.38)]"
             >
-              Send an Enquiry
+              Send a Bulk Enquiry
 
               <ArrowUpRight
                 size={18}
@@ -242,17 +261,21 @@ export default function ContactHero() {
 
         {/* RIGHT SIDE DECORATIVE TEXT */}
         <motion.div
-          initial={{
-            opacity: 0,
-            x: reduceMotion ? 0 : 30,
-          }}
+          initial={
+            reduceMotion
+              ? false
+              : {
+                  opacity: 0,
+                  x: 30,
+                }
+          }
           animate={{
             opacity: 1,
             x: 0,
           }}
           transition={{
-            duration: 1.2,
-            delay: 0.8,
+            duration: reduceMotion ? 0 : 1.2,
+            delay: reduceMotion ? 0 : 0.8,
             ease: EASE,
           }}
           className="pointer-events-none absolute bottom-[160px] right-12 hidden items-end gap-3 xl:flex"
@@ -260,7 +283,7 @@ export default function ContactHero() {
           <span className="h-px w-14 bg-[#E9AC12]/70" />
 
           <span className="text-[10px] font-bold uppercase tracking-[3px] text-white/65 [writing-mode:vertical-rl]">
-            AGRICULTURE • INDUSTRY • SUPPLY
+            AGRICULTURE • FOOD • INDUSTRY • SUPPLY
           </span>
         </motion.div>
       </div>
@@ -268,52 +291,71 @@ export default function ContactHero() {
       {/* ==================================
           BOTTOM FLOATING CATEGORY STRIP
       ================================== */}
+
       <div className="absolute inset-x-0 bottom-0 z-20 border-t border-white/15 bg-[#172331]/75 backdrop-blur-xl">
-        <div className="mx-auto grid max-w-[1450px] grid-cols-3 px-3 sm:px-8 lg:px-12">
+
+        <div className="mx-auto grid max-w-[1450px] grid-cols-5 px-2 sm:px-8 lg:px-12">
+
           {categories.map((item, index) => {
             const Icon = item.icon;
 
             return (
               <motion.div
                 key={item.no}
-                initial={{
-                  opacity: 0,
-                  y: reduceMotion ? 0 : 25,
+                initial={
+                  reduceMotion
+                    ? false
+                    : {
+                        opacity: 0,
+                        y: 25,
+                      }
+                }
+                animate={{
+                  opacity: 1,
+                  y: 0,
                 }}
-                animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: 0.7,
-                  delay: 0.75 + index * 0.12,
+                  duration: reduceMotion ? 0 : 0.7,
+                  delay: reduceMotion
+                    ? 0
+                    : 0.75 + index * 0.12,
                   ease: EASE,
                 }}
-                className={`group/item relative flex min-w-0 items-center gap-2 px-2 py-5 transition-colors duration-300 hover:bg-white/[0.07] sm:gap-4 sm:px-5 lg:py-6 ${
-                  index !== 0 ? "border-l border-white/10" : ""
+                className={`group/item relative flex min-w-0 flex-col items-center justify-center gap-2 px-1 py-4 text-center transition-colors duration-300 hover:bg-white/[0.07] sm:flex-row sm:justify-start sm:gap-3 sm:px-3 sm:py-5 sm:text-left lg:py-6 ${
+                  index !== 0
+                    ? "border-l border-white/10"
+                    : ""
                 }`}
               >
                 {/* HOVER LINE */}
                 <div className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-[#E9AC12] transition-transform duration-500 group-hover/item:scale-x-100" />
 
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#E9AC12]/30 bg-[#E9AC12]/10 text-[#E9AC12] transition-all duration-300 group-hover/item:bg-[#E9AC12] group-hover/item:text-[#172331] sm:h-11 sm:w-11">
-                  <Icon size={19} strokeWidth={1.7} />
+                {/* ICON */}
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#E9AC12]/30 bg-[#E9AC12]/10 text-[#E9AC12] transition-all duration-300 group-hover/item:bg-[#E9AC12] group-hover/item:text-[#172331] sm:h-10 sm:w-10 lg:h-11 lg:w-11">
+                  <Icon
+                    size={18}
+                    strokeWidth={1.7}
+                  />
                 </div>
 
+                {/* CATEGORY TEXT */}
                 <div className="min-w-0">
-                  <span className="mb-1 hidden text-[9px] font-bold tracking-[1.5px] text-[#E9AC12] sm:block">
+                  <span className="mb-1 hidden text-[9px] font-bold tracking-[1.5px] text-[#E9AC12] lg:block">
                     {item.no}
                   </span>
 
-                  <h3 className="text-[10px] font-extrabold leading-[1.4] text-white sm:text-[13px]">
+                  <h3 className="text-[9px] font-extrabold leading-[1.35] text-white sm:text-[11px] lg:text-[13px]">
                     {item.title}
                   </h3>
 
-                  <p className="mt-1 hidden text-[11px] text-[#B8C5D2] sm:block">
+                  <p className="mt-1 hidden text-[10px] text-[#B8C5D2] lg:block">
                     {item.subtitle}
                   </p>
                 </div>
 
                 <MoveUpRight
                   size={15}
-                  className="ml-auto hidden text-[#E9AC12] opacity-0 transition-all duration-300 group-hover/item:-translate-y-1 group-hover/item:translate-x-1 group-hover/item:opacity-100 lg:block"
+                  className="ml-auto hidden shrink-0 text-[#E9AC12] opacity-0 transition-all duration-300 group-hover/item:-translate-y-1 group-hover/item:translate-x-1 group-hover/item:opacity-100 xl:block"
                 />
               </motion.div>
             );

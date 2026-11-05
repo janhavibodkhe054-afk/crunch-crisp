@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -26,7 +26,7 @@ import {
 
 /* ======================================
    CRUNCH & CRISP INDIA LLP
-   MOBILE OPTIMIZED FOOTER
+   UPDATED RESPONSIVE FOOTER
 ====================================== */
 
 const PHONE = "+918983973799";
@@ -34,52 +34,76 @@ const PHONE = "+918983973799";
 const WHATSAPP_URL =
   "https://wa.me/918983973799?text=" +
   encodeURIComponent(
-    "Hello Crunch & Crisp India LLP, I would like to enquire about your products and business requirements."
+    "Hello Crunch & Crisp India LLP, I would like to enquire about your Corn Processing Products, Agricultural Commodities, Premium Basmati Rice, Turmeric, Turmeric Powder, Indian Spices and Frozen Foods. Please share product specifications, packaging options and bulk supply information."
   );
+
+/* ======================================
+   QUICK LINKS
+====================================== */
 
 const QUICK_LINKS = [
   { name: "Home", path: "/" },
   { name: "About Us", path: "/about" },
   { name: "Our Products", path: "/products" },
   { name: "Industries We Serve", path: "/industries" },
-  { name: "Quality & Manufacturing", path: "/quality" },
+  { name: "Quality & Supply Approach", path: "/quality" },
   { name: "Contact Us", path: "/contact" },
 ];
+
+/* ======================================
+   PRODUCT LINKS
+====================================== */
 
 const PRODUCT_LINKS = [
   {
     name: "Premium Corn Grits",
-    path: "/products/premium-corn-grits",
+    path: "/products",
   },
   {
     name: "Fine Corn Powder",
-    path: "/products/fine-corn-powder",
+    path: "/products",
   },
   {
     name: "Yellow Crushed Maize",
-    path: "/products/yellow-crushed-maize",
+    path: "/products",
   },
   {
     name: "Yellow Maize Seeds",
-    path: "/products/yellow-maize-seeds",
+    path: "/products",
   },
   {
     name: "Whole Yellow Corn Germ",
-    path: "/products/whole-yellow-corn-germ",
+    path: "/products",
   },
   {
     name: "Corn Cob",
-    path: "/products/corn-cob",
+    path: "/products",
   },
   {
     name: "Agricultural Commodities",
-    path: "/products/agricultural-commodities",
+    path: "/products",
+  },
+  {
+    name: "Premium Basmati Rice",
+    path: "/products",
+  },
+  {
+    name: "Turmeric & Turmeric Powder",
+    path: "/products",
+  },
+  {
+    name: "Indian Spices",
+    path: "/products",
   },
   {
     name: "Frozen Foods",
-    path: "/products/frozen-foods",
+    path: "/products",
   },
 ];
+
+/* ======================================
+   SOCIAL LINKS
+====================================== */
 
 const SOCIAL_LINKS = [
   {
@@ -101,6 +125,10 @@ const SOCIAL_LINKS = [
     color: "#0A66C2",
   },
 ];
+
+/* ======================================
+   FLOATING PARTICLES
+====================================== */
 
 const particles = [
   { x: "6%", y: "18%", size: 4, delay: 0, duration: 5 },
@@ -150,7 +178,8 @@ function useIsMobile() {
 function AnimatedBackground({ animateEffects }) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* GRID TEXTURE - DESKTOP ONLY */}
+
+      {/* GRID TEXTURE */}
       <div
         className="absolute inset-0 hidden opacity-[0.055] lg:block"
         style={{
@@ -160,7 +189,7 @@ function AnimatedBackground({ animateEffects }) {
         }}
       />
 
-      {/* STATIC MOBILE BACKGROUND */}
+      {/* MOBILE BACKGROUND */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#202832] via-[#202A38] to-[#19212B] lg:hidden" />
 
       {animateEffects && (
@@ -299,6 +328,7 @@ function FooterHeading({ children, animateEffects }) {
 function FooterSocials({ animateEffects }) {
   return (
     <div className="flex flex-wrap items-center gap-2.5">
+
       {SOCIAL_LINKS.map((social) => {
         const Icon = social.icon;
 
@@ -403,7 +433,7 @@ export default function Footer() {
   const reduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
 
-  const footerRef = React.useRef(null);
+  const footerRef = useRef(null);
 
   const isInView = useInView(footerRef, {
     amount: 0.1,
@@ -472,14 +502,15 @@ export default function Footer() {
       </div>
 
       {/* ======================================
-          MAIN CONTENT
+          MAIN FOOTER CONTENT
       ====================================== */}
 
       <div className="relative mx-auto w-[calc(100%-32px)] max-w-[1440px] pb-11 pt-12 sm:w-[calc(100%-60px)] sm:pb-12 sm:pt-14 lg:pb-14 lg:pt-16">
+
         <div className="grid grid-cols-1 gap-x-9 gap-y-9 sm:grid-cols-2 lg:grid-cols-12 lg:gap-x-9">
 
           {/* ======================================
-              COMPANY
+              COMPANY INFORMATION
           ====================================== */}
 
           <motion.div
@@ -510,14 +541,16 @@ export default function Footer() {
               />
             </Link>
 
-            {/* DESCRIPTION */}
+            {/* UPDATED COMPANY DESCRIPTION */}
             <p className="mt-4 max-w-[370px] text-[14px] leading-[1.85] text-white/75">
-              Crunch & Crisp India LLP delivers quality corn products,
-              agricultural commodities and frozen food solutions to support
-              diverse business and industrial requirements.
+              Crunch & Crisp India LLP supports businesses
+              with Corn Processing Products, Agricultural
+              Commodities, Premium Basmati Rice, Turmeric,
+              Indian Spices and Frozen Food solutions for
+              diverse commercial requirements.
             </p>
 
-            {/* QUALITY LINE */}
+            {/* UPDATED QUALITY LINE */}
             <div className="mt-5 flex items-center gap-2.5 text-[12px] font-bold text-[#F4BD43]">
               <motion.span
                 animate={
@@ -537,10 +570,10 @@ export default function Footer() {
                 <PackageCheck size={19} />
               </motion.span>
 
-              Quality Products. Reliable Supply.
+              Quality-Focused Products. Business-Oriented Supply.
             </div>
 
-            {/* SOCIAL LINKS */}
+            {/* SOCIAL ICONS */}
             <div className="mt-6">
               <FooterSocials animateEffects={animateEffects} />
             </div>
@@ -560,13 +593,16 @@ export default function Footer() {
 
             <ul className="flex flex-col gap-3">
               {QUICK_LINKS.map((item) => (
-                <FooterLink key={item.path} item={item} />
+                <FooterLink
+                  key={item.path}
+                  item={item}
+                />
               ))}
             </ul>
           </motion.div>
 
           {/* ======================================
-              PRODUCTS
+              OUR PRODUCTS
           ====================================== */}
 
           <motion.div
@@ -579,13 +615,16 @@ export default function Footer() {
 
             <ul className="flex flex-col gap-3">
               {PRODUCT_LINKS.map((item) => (
-                <FooterLink key={item.path} item={item} />
+                <FooterLink
+                  key={item.name}
+                  item={item}
+                />
               ))}
             </ul>
           </motion.div>
 
           {/* ======================================
-              CONTACT
+              GET IN TOUCH
           ====================================== */}
 
           <motion.div
@@ -596,9 +635,12 @@ export default function Footer() {
               Get in Touch
             </FooterHeading>
 
+            {/* UPDATED CONTACT DESCRIPTION */}
             <p className="mb-5 text-[13.5px] leading-[1.75] text-white/75">
-              Have a product enquiry or business requirement? Connect with our
-              team for more information.
+              Looking for agricultural commodities,
+              food products or bulk supply solutions?
+              Connect with our team to discuss your
+              product and procurement requirements.
             </p>
 
             {/* PHONE */}
@@ -662,12 +704,15 @@ export default function Footer() {
       <div className="relative border-t border-white/10 bg-[#19212B]">
         <div className="mx-auto flex w-[calc(100%-32px)] max-w-[1440px] flex-col items-center justify-between gap-3 py-4 text-center sm:w-[calc(100%-60px)] lg:flex-row lg:text-left">
 
+          {/* COPYRIGHT */}
           <p className="text-[12px] leading-5 text-white/65">
             © {year} Crunch & Crisp India LLP. All Rights Reserved.
           </p>
 
+          {/* DEVELOPER CREDIT */}
           <p className="text-[12px] leading-5 text-white/65">
             Designed & Developed by{" "}
+
             <a
               href="https://hashgridtech.com/"
               target="_blank"
@@ -675,7 +720,6 @@ export default function Footer() {
               className="group inline-flex items-center gap-1 font-bold text-[#F4BD43] transition-colors duration-200 hover:text-white"
             >
               HashGrid Technologies Pvt. Ltd.
-
               <ArrowUpRight size={13} />
             </a>
           </p>

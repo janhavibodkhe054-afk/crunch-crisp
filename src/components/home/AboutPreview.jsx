@@ -365,7 +365,7 @@ export default function AboutPreview() {
                     "
                   >
                     <img
-                      src="/about1.jpg"
+                      src="/basmati.jpg"
                       alt="Corn products and agricultural supply"
                       loading="lazy"
                       decoding="async"

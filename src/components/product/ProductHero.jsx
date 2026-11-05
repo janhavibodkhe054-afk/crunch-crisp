@@ -152,6 +152,7 @@ export default function ProductHero() {
 
   const entry = (desktop, mobile, delay = 0) => ({
     initial: reduceMotion ? false : isMobile ? mobile : desktop,
+
     animate: {
       opacity: 1,
       x: 0,
@@ -160,6 +161,7 @@ export default function ProductHero() {
       rotateY: 0,
       scale: 1,
     },
+
     transition: {
       duration: reduceMotion ? 0 : isMobile ? 0.55 : 0.9,
       delay: reduceMotion ? 0 : delay,
@@ -281,7 +283,6 @@ export default function ProductHero() {
 
         {/* ======================================
             GOLDEN LIGHT SWEEP
-            DESKTOP FULL / MOBILE LIGHT
         ====================================== */}
 
         {desktopEffects && (
@@ -436,9 +437,9 @@ export default function ProductHero() {
             }}
             className="text-[clamp(34px,4.2vw,58px)] font-extrabold leading-[1.12] tracking-[-1.3px]"
           >
-            Our{" "}
+            Explore Our{" "}
             <span className="bg-gradient-to-r from-[#F6A43A] via-[#E9AC12] to-[#FFE39B] bg-clip-text text-transparent">
-              Products
+              Product Portfolio
             </span>
           </motion.h1>
 
@@ -456,11 +457,13 @@ export default function ProductHero() {
               },
               0.35
             )}
-            className="mt-6 max-w-[620px] text-[14px] leading-[1.9] text-[#E0E6EB] sm:text-[15px]"
+            className="mt-6 max-w-[670px] text-[14px] leading-[1.9] text-[#E0E6EB] sm:text-[15px]"
           >
-            Explore our range of corn-based products,
-            agricultural commodities and frozen foods for
-            commercial and industrial applications.
+            Discover our diverse range of Corn Processing Products,
+            Corn-Based Agricultural Commodities, Premium Basmati Rice
+            and Indian Spices, with a special focus on Turmeric and
+            Turmeric Powder — supporting bulk procurement and
+            commercial supply requirements.
           </motion.p>
 
           {/* ======================================

@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 
 import {
   motion,
+  AnimatePresence,
   useReducedMotion,
   useInView,
 } from "framer-motion";
@@ -23,6 +24,7 @@ import {
 /* ======================================
    PRODUCT DATA
 ====================================== */
+
 
 const products = [
   {
@@ -55,16 +57,32 @@ const products = [
     name: "Corn Cob",
     image: "/p6.png",
   },
+  {
+    id: 7,
+    name: "Premium Basmati Rice",
+    image: "/p7.png",
+  },
+  {
+    id: 8,
+    name: "Turmeric Powder",
+    image: "/p8.png",
+  },
+  {
+    id: 9,
+    name: "Indian Spices",
+    image: "/p9.png",
+  },
 ];
+
+
+const ease = [0.22, 1, 0.36, 1];
 
 const wrap = (index) =>
   ((index % products.length) + products.length) %
   products.length;
 
-const ease = [0.22, 1, 0.36, 1];
-
 /* ======================================
-   RESPONSIVE DETECTION
+   MOBILE DETECTION
 ====================================== */
 
 function useIsMobile() {
@@ -79,21 +97,143 @@ function useIsMobile() {
 
     const update = () => setIsMobile(media.matches);
 
+    update();
+
     media.addEventListener("change", update);
 
-    return () => media.removeEventListener("change", update);
+    return () => {
+      media.removeEventListener("change", update);
+    };
   }, []);
 
   return isMobile;
 }
 
 /* ======================================
-   MAIN COMPONENT
+   DESKTOP CAROUSEL POSITIONS
+====================================== */
+
+const desktopPositions = {
+  "-3": {
+    x: -610,
+    scale: 0.55,
+    rotateY: 40,
+    opacity: 0,
+    zIndex: 0,
+  },
+  "-2": {
+    x: -470,
+    scale: 0.72,
+    rotateY: 28,
+    opacity: 0.65,
+    zIndex: 1,
+  },
+  "-1": {
+    x: -260,
+    scale: 0.88,
+    rotateY: 15,
+    opacity: 0.9,
+    zIndex: 3,
+  },
+  "0": {
+    x: 0,
+    scale: 1.12,
+    rotateY: 0,
+    opacity: 1,
+    zIndex: 10,
+  },
+  "1": {
+    x: 260,
+    scale: 0.88,
+    rotateY: -15,
+    opacity: 0.9,
+    zIndex: 3,
+  },
+  "2": {
+    x: 470,
+    scale: 0.72,
+    rotateY: -28,
+    opacity: 0.65,
+    zIndex: 1,
+  },
+  "3": {
+    x: 610,
+    scale: 0.55,
+    rotateY: -40,
+    opacity: 0,
+    zIndex: 0,
+  },
+};
+
+/* ======================================
+   MOBILE PRODUCT SLIDE
+====================================== */
+
+function MobileProductSlide({
+  product,
+  offset,
+  reducedMotion,
+  onClick,
+}) {
+  const isActive = offset === 0;
+
+  return (
+    <motion.button
+      type="button"
+      aria-label={`Show ${product.name}`}
+      aria-pressed={isActive}
+      onClick={onClick}
+      initial={false}
+      animate={{
+        x: `${offset * 77}%`,
+        scale: isActive ? 1 : 0.68,
+        opacity: isActive ? 1 : 0.48,
+        rotateY: reducedMotion ? 0 : offset * -17,
+      }}
+      transition={{
+        duration: reducedMotion ? 0 : 0.48,
+        ease,
+      }}
+      style={{
+        zIndex: isActive ? 10 : 2,
+        transformStyle: "preserve-3d",
+        pointerEvents: isActive ? "none" : "auto",
+      }}
+      className="
+        absolute flex
+        h-[260px] w-[76%]
+        max-w-[360px]
+        items-center justify-center
+        sm:h-[340px]
+        focus-visible:outline-2
+        focus-visible:outline-[#E66A16]
+      "
+    >
+      <img
+        src={product.image}
+        alt={product.name}
+        loading={isActive ? "eager" : "lazy"}
+        decoding="async"
+        draggable={false}
+        className="
+          max-h-full w-full
+          select-none object-contain
+          drop-shadow-[0_12px_15px_rgba(0,0,0,0.12)]
+        "
+      />
+    </motion.button>
+  );
+}
+
+/* ======================================
+   MAIN PRODUCT RANGE
 ====================================== */
 
 export default function ProductRange() {
   const sectionRef = useRef(null);
+
   const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
 
   const isMobile = useIsMobile();
   const reducedMotion = useReducedMotion();
@@ -106,6 +246,8 @@ export default function ProductRange() {
   const [paused, setPaused] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
 
+  const [direction, setDirection] = useState(1);
+
   const activeProduct = products[activeIndex];
 
   /* ======================================
@@ -113,16 +255,22 @@ export default function ProductRange() {
   ====================================== */
 
   const next = useCallback(() => {
+    setDirection(1);
     setActiveIndex((prev) => wrap(prev + 1));
   }, []);
 
   const previous = useCallback(() => {
+    setDirection(-1);
     setActiveIndex((prev) => wrap(prev - 1));
   }, []);
 
-  const goTo = (index) => {
-    setActiveIndex(wrap(index));
-  };
+  const goTo = useCallback(
+    (index) => {
+      setDirection(index >= activeIndex ? 1 : -1);
+      setActiveIndex(wrap(index));
+    },
+    [activeIndex]
+  );
 
   /* ======================================
      PAGE VISIBILITY
@@ -149,17 +297,47 @@ export default function ProductRange() {
   }, []);
 
   /* ======================================
-     AUTO PLAY
+     IMAGE PRELOADING
   ====================================== */
-useEffect(() => {
-  if (paused || !pageVisible || !isInView) return;
 
-  const timer = window.setInterval(() => {
-    setActiveIndex((prev) => wrap(prev + 1));
-  }, 2000); // Every 2 seconds
+  useEffect(() => {
+    if (!isInView) return;
 
-  return () => window.clearInterval(timer);
-}, [paused, pageVisible, isInView]);
+    const nearby = [
+      products[activeIndex],
+      products[wrap(activeIndex + 1)],
+      products[wrap(activeIndex - 1)],
+    ];
+
+    nearby.forEach((product) => {
+      const img = new Image();
+      img.src = product.image;
+    });
+  }, [activeIndex, isInView]);
+
+  /* ======================================
+     AUTOPLAY — EVERY 2 SECONDS
+  ====================================== */
+
+  useEffect(() => {
+    if (
+      paused ||
+      !pageVisible ||
+      !isInView ||
+      reducedMotion
+    ) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setDirection(1);
+      setActiveIndex((prev) => wrap(prev + 1));
+    }, 2000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [paused, pageVisible, isInView, reducedMotion]);
 
   /* ======================================
      TOUCH SWIPE
@@ -167,16 +345,28 @@ useEffect(() => {
 
   const handleTouchStart = (event) => {
     touchStartX.current = event.touches[0].clientX;
+    touchStartY.current = event.touches[0].clientY;
   };
 
   const handleTouchEnd = (event) => {
-    if (touchStartX.current === null) return;
+    if (
+      touchStartX.current === null ||
+      touchStartY.current === null
+    ) {
+      return;
+    }
 
     const endX = event.changedTouches[0].clientX;
-    const difference = touchStartX.current - endX;
+    const endY = event.changedTouches[0].clientY;
 
-    if (Math.abs(difference) > 50) {
-      if (difference > 0) {
+    const differenceX = touchStartX.current - endX;
+    const differenceY = touchStartY.current - endY;
+
+    if (
+      Math.abs(differenceX) > 45 &&
+      Math.abs(differenceX) > Math.abs(differenceY)
+    ) {
+      if (differenceX > 0) {
         next();
       } else {
         previous();
@@ -184,10 +374,11 @@ useEffect(() => {
     }
 
     touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   /* ======================================
-     DESKTOP 3D POSITIONS
+     DESKTOP OFFSET
   ====================================== */
 
   const getOffset = (index) => {
@@ -204,61 +395,27 @@ useEffect(() => {
     return offset;
   };
 
-  const getDesktopPosition = (offset) => {
-    const positions = {
-      "-3": {
-        x: -610,
-        scale: 0.55,
-        rotateY: 40,
-        opacity: 0,
-        zIndex: 0,
-      },
-      "-2": {
-        x: -470,
-        scale: 0.72,
-        rotateY: 28,
-        opacity: 0.65,
-        zIndex: 1,
-      },
-      "-1": {
-        x: -260,
-        scale: 0.88,
-        rotateY: 15,
-        opacity: 0.9,
-        zIndex: 3,
-      },
-      "0": {
-        x: 0,
-        scale: 1.12,
-        rotateY: 0,
-        opacity: 1,
-        zIndex: 10,
-      },
-      "1": {
-        x: 260,
-        scale: 0.88,
-        rotateY: -15,
-        opacity: 0.9,
-        zIndex: 3,
-      },
-      "2": {
-        x: 470,
-        scale: 0.72,
-        rotateY: -28,
-        opacity: 0.65,
-        zIndex: 1,
-      },
-      "3": {
-        x: 610,
-        scale: 0.55,
-        rotateY: -40,
-        opacity: 0,
-        zIndex: 0,
-      },
-    };
+  /* ======================================
+     MOBILE VISIBLE PRODUCTS
+  ====================================== */
 
-    return positions[String(offset)] || positions["3"];
-  };
+  const mobileProducts = [
+    {
+      product: products[wrap(activeIndex - 1)],
+      index: wrap(activeIndex - 1),
+      offset: -1,
+    },
+    {
+      product: products[activeIndex],
+      index: activeIndex,
+      offset: 0,
+    },
+    {
+      product: products[wrap(activeIndex + 1)],
+      index: wrap(activeIndex + 1),
+      offset: 1,
+    },
+  ];
 
   return (
     <section
@@ -270,18 +427,45 @@ useEffect(() => {
         py-12 sm:py-16 lg:py-24
       "
     >
-      {/* BACKGROUND */}
+      {/* ======================================
+          BACKGROUND
+      ====================================== */}
+
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,#FFFFFF_0%,#F8F9FA_65%,#F1F2F4_100%)]" />
 
-      {/* DECORATIVE ELEMENTS - DESKTOP ONLY */}
+      {/* DESKTOP DECORATION */}
       <div className="pointer-events-none absolute left-[6%] top-[20%] hidden h-[180px] w-[180px] opacity-20 [background-image:radial-gradient(#E9AC12_2px,transparent_2px)] [background-size:16px_16px] lg:block" />
 
       <div className="pointer-events-none absolute bottom-[12%] right-[6%] hidden h-[150px] w-[150px] opacity-15 [background-image:radial-gradient(#E66A16_2px,transparent_2px)] [background-size:16px_16px] lg:block" />
 
       <div className="relative mx-auto max-w-[1600px] px-4 sm:px-8 lg:px-10">
 
-        {/* HEADING */}
-        <div className="mb-5 text-center">
+        {/* ======================================
+            HEADING
+        ====================================== */}
+
+        <motion.div
+          initial={
+            reducedMotion
+              ? false
+              : {
+                  opacity: 0,
+                  y: 18,
+                }
+          }
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+          }}
+          transition={{
+            duration: 0.55,
+            ease,
+          }}
+          className="mb-5 text-center"
+        >
           <div className="inline-flex items-center gap-3">
             <span className="h-[2px] w-7 bg-[#E66A16] sm:w-9" />
 
@@ -291,7 +475,7 @@ useEffect(() => {
 
             <span className="h-[2px] w-7 bg-[#E66A16] sm:w-9" />
           </div>
-        </div>
+        </motion.div>
 
         {/* ======================================
             CAROUSEL WRAPPER
@@ -299,7 +483,11 @@ useEffect(() => {
 
         <div
           className="relative"
-          onMouseEnter={() => setPaused(true)}
+          onMouseEnter={(event) => {
+            if (event.pointerType !== "touch") {
+              setPaused(true);
+            }
+          }}
           onMouseLeave={() => setPaused(false)}
           onFocusCapture={() => setPaused(true)}
           onBlurCapture={(event) => {
@@ -320,14 +508,21 @@ useEffect(() => {
 
           {!isMobile && (
             <div
-              className="relative mx-auto flex h-[470px] max-w-[1500px] items-center justify-center"
+              className="
+                relative mx-auto flex
+                h-[470px] max-w-[1500px]
+                items-center justify-center
+              "
               style={{
                 perspective: "1200px",
               }}
             >
               {products.map((product, index) => {
                 const offset = getOffset(index);
-                const position = getDesktopPosition(offset);
+
+                const position =
+                  desktopPositions[String(offset)] ||
+                  desktopPositions["3"];
 
                 return (
                   <motion.button
@@ -357,7 +552,13 @@ useEffect(() => {
                           ? "none"
                           : "auto",
                     }}
-                    className="flex h-[420px] w-[340px] cursor-pointer items-center justify-center focus-visible:outline-2 focus-visible:outline-[#E66A16]"
+                    className="
+                      flex h-[420px] w-[340px]
+                      cursor-pointer
+                      items-center justify-center
+                      focus-visible:outline-2
+                      focus-visible:outline-[#E66A16]
+                    "
                   >
                     <img
                       src={product.image}
@@ -365,7 +566,11 @@ useEffect(() => {
                       loading="lazy"
                       decoding="async"
                       draggable={false}
-                      className="max-h-[390px] w-full select-none object-contain drop-shadow-[0_20px_28px_rgba(0,0,0,0.15)]"
+                      className="
+                        max-h-[390px] w-full
+                        select-none object-contain
+                        drop-shadow-[0_20px_28px_rgba(0,0,0,0.15)]
+                      "
                     />
                   </motion.button>
                 );
@@ -374,40 +579,30 @@ useEffect(() => {
           )}
 
           {/* ======================================
-              MOBILE / TABLET CAROUSEL
+              MOBILE 3D CAROUSEL
           ====================================== */}
 
           {isMobile && (
             <div
               className="
-                relative flex h-[280px]
+                relative flex h-[285px]
                 items-center justify-center
                 overflow-hidden
                 sm:h-[370px]
               "
+              style={{
+                perspective: "900px",
+              }}
             >
-              <motion.img
-                key="mobile-product-image"
-                src={activeProduct.image}
-                alt={activeProduct.name}
-                initial={false}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                }}
-                transition={{
-                  duration: reducedMotion ? 0 : 0.25,
-                }}
-                loading="lazy"
-                decoding="async"
-                draggable={false}
-                className="
-                  h-[260px] w-[78%]
-                  max-w-[380px]
-                  object-contain
-                  sm:h-[350px]
-                "
-              />
+              {mobileProducts.map(({ product, index, offset }) => (
+                <MobileProductSlide
+                  key={product.id}
+                  product={product}
+                  offset={offset}
+                  reducedMotion={reducedMotion}
+                  onClick={() => goTo(index)}
+                />
+              ))}
             </div>
           )}
 
@@ -467,13 +662,47 @@ useEffect(() => {
         </div>
 
         {/* ======================================
-            ACTIVE PRODUCT INFORMATION
+            ACTIVE PRODUCT INFO
         ====================================== */}
 
         <div className="mx-auto mt-4 text-center">
-          <h3 className="min-h-[34px] text-[20px] font-extrabold tracking-[-0.5px] text-[#202A38] sm:text-[27px]">
-            {activeProduct.name}
-          </h3>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.h3
+              key={activeProduct.id}
+              initial={
+                reducedMotion
+                  ? false
+                  : {
+                      opacity: 0,
+                      y: direction * 10,
+                    }
+              }
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              exit={
+                reducedMotion
+                  ? undefined
+                  : {
+                      opacity: 0,
+                      y: -direction * 10,
+                    }
+              }
+              transition={{
+                duration: reducedMotion ? 0 : 0.2,
+              }}
+              className="
+                min-h-[34px]
+                text-[20px] font-extrabold
+                tracking-[-0.5px]
+                text-[#202A38]
+                sm:text-[27px]
+              "
+            >
+              {activeProduct.name}
+            </motion.h3>
+          </AnimatePresence>
 
           <Link
             to="/products"
@@ -498,7 +727,10 @@ useEffect(() => {
           </Link>
         </div>
 
-        {/* PAGINATION DOTS */}
+        {/* ======================================
+            PAGINATION DOTS
+        ====================================== */}
+
         <div className="mt-7 flex items-center justify-center gap-2.5">
           {products.map((product, index) => (
             <button
@@ -511,11 +743,16 @@ useEffect(() => {
                   ? "true"
                   : undefined
               }
-              className={`h-[8px] rounded-full transition-[width,background-color] duration-200 ${
-                index === activeIndex
-                  ? "w-9 bg-[#E66A16]"
-                  : "w-[8px] bg-[#D2D6DC] hover:bg-[#E9AC12]"
-              }`}
+              className={`
+                h-[8px] rounded-full
+                transition-[width,background-color]
+                duration-200
+                ${
+                  index === activeIndex
+                    ? "w-9 bg-[#E66A16]"
+                    : "w-[8px] bg-[#D2D6DC] hover:bg-[#E9AC12]"
+                }
+              `}
             />
           ))}
         </div>

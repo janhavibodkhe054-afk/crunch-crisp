@@ -24,11 +24,11 @@ const ease = [0.22, 1, 0.36, 1];
 const highlights = [
   {
     icon: Wheat,
-    title: "Quality Products",
+    title: "Diverse Product Range",
   },
   {
     icon: Handshake,
-    title: "Reliable Supply",
+    title: "Bulk Supply Solutions",
   },
   {
     icon: TrendingUp,
@@ -54,9 +54,19 @@ function useIsMobile() {
 
     update();
 
-    media.addEventListener("change", update);
+    if (media.addEventListener) {
+      media.addEventListener("change", update);
+    } else {
+      media.addListener(update);
+    }
 
-    return () => media.removeEventListener("change", update);
+    return () => {
+      if (media.removeEventListener) {
+        media.removeEventListener("change", update);
+      } else {
+        media.removeListener(update);
+      }
+    };
   }, []);
 
   return isMobile;
@@ -71,6 +81,7 @@ function HighlightItem({
   index,
   animateEffects,
   reduceMotion,
+  isMobile,
 }) {
   const Icon = item.icon;
 
@@ -81,7 +92,7 @@ function HighlightItem({
           ? false
           : {
               opacity: 0,
-              y: animateEffects ? 20 : 10,
+              y: isMobile ? 10 : 20,
             }
       }
       whileInView={{
@@ -93,8 +104,8 @@ function HighlightItem({
         amount: 0.15,
       }}
       transition={{
-        duration: animateEffects ? 0.6 : 0.35,
-        delay: animateEffects ? 0.4 + index * 0.12 : 0,
+        duration: isMobile ? 0.4 : 0.6,
+        delay: isMobile ? index * 0.06 : 0.4 + index * 0.12,
         ease,
       }}
       whileHover={
@@ -166,8 +177,36 @@ export default function WhoWeAre() {
     amount: 0.15,
   });
 
+  const [pageVisible, setPageVisible] = useState(true);
+
+  useEffect(() => {
+    const update = () => {
+      setPageVisible(!document.hidden);
+    };
+
+    update();
+
+    document.addEventListener("visibilitychange", update);
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        update
+      );
+    };
+  }, []);
+
   const animateEffects =
-    !isMobile && !reduceMotion && isInView;
+    !isMobile &&
+    !reduceMotion &&
+    isInView &&
+    pageVisible;
+
+  const mobileEffects =
+    isMobile &&
+    !reduceMotion &&
+    isInView &&
+    pageVisible;
 
   /* ======================================
      DESKTOP MOUSE TILT
@@ -244,7 +283,7 @@ export default function WhoWeAre() {
     },
 
     transition: {
-      duration: isMobile ? 0.4 : 0.7,
+      duration: reduceMotion ? 0 : isMobile ? 0.4 : 0.7,
       delay: isMobile ? 0 : delay,
       ease,
     },
@@ -413,7 +452,7 @@ export default function WhoWeAre() {
               >
                 <motion.img
                   src="/fresh.png"
-                  alt="Premium corn and agricultural products"
+                  alt="Crunch & Crisp agricultural products including corn, rice and spices"
                   loading="lazy"
                   decoding="async"
                   draggable={false}
@@ -423,7 +462,14 @@ export default function WhoWeAre() {
                           y: [0, -12, 0],
                           rotateZ: [0, 1.5, 0, -1.5, 0],
                         }
-                      : undefined
+                      : mobileEffects
+                      ? {
+                          y: [0, -5, 0],
+                        }
+                      : {
+                          y: 0,
+                          rotateZ: 0,
+                        }
                   }
                   whileHover={
                     !isMobile && !reduceMotion
@@ -434,13 +480,16 @@ export default function WhoWeAre() {
                   }
                   transition={{
                     y: {
-                      duration: 5,
-                      repeat: Infinity,
+                      duration: isMobile ? 6 : 5,
+                      repeat:
+                        animateEffects || mobileEffects
+                          ? Infinity
+                          : 0,
                       ease: "easeInOut",
                     },
                     rotateZ: {
                       duration: 8,
-                      repeat: Infinity,
+                      repeat: animateEffects ? Infinity : 0,
                       ease: "easeInOut",
                     },
                     scale: {
@@ -498,7 +547,7 @@ export default function WhoWeAre() {
               Building Value Through
 
               <span className="block text-[#E66A16]">
-                Agricultural Products.
+                Agriculture & Quality Products.
               </span>
             </motion.h2>
 
@@ -509,7 +558,8 @@ export default function WhoWeAre() {
             >
               Crunch & Crisp India LLP is an India-based company
               engaged in corn processing products, agricultural
-              commodities and frozen food solutions.
+              commodities, Indian spices and premium Basmati Rice
+              for commercial and industrial requirements.
             </motion.p>
 
             {/* PARAGRAPH 2 */}
@@ -517,9 +567,10 @@ export default function WhoWeAre() {
               {...reveal(0.45)}
               className="mt-4 text-[14px] leading-[1.85] text-[#596674] sm:text-[15px] lg:leading-[1.9]"
             >
-              Our product range includes Corn Grits, Corn Cob,
-              Corn Germ, Yellow Crushed Maize, Fine Corn Powder
-              and other agricultural products.
+              Our product portfolio includes Corn Grits, Corn Cob,
+              Corn Germ, Yellow Crushed Maize, Fine Corn Powder,
+              Premium Basmati Rice and Indian Spices, with a
+              special focus on Turmeric and Turmeric Powder.
             </motion.p>
 
             {/* PARAGRAPH 3 */}
@@ -527,9 +578,10 @@ export default function WhoWeAre() {
               {...reveal(0.55)}
               className="mt-4 text-[14px] leading-[1.85] text-[#596674] sm:text-[15px] lg:leading-[1.9]"
             >
-              We focus on understanding commercial requirements
-              and delivering product solutions that support
-              businesses across different sectors.
+              We focus on understanding bulk procurement needs,
+              product quality expectations and customer specifications,
+              providing agricultural and food product solutions
+              for businesses across different sectors.
             </motion.p>
 
             {/* ======================================
@@ -557,6 +609,7 @@ export default function WhoWeAre() {
                   index={index}
                   animateEffects={animateEffects}
                   reduceMotion={reduceMotion}
+                  isMobile={isMobile}
                 />
               ))}
             </motion.div>

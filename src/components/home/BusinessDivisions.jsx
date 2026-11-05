@@ -16,13 +16,14 @@ import {
 import {
   Wheat,
   Sprout,
-  Snowflake,
+  Flame,
   ArrowUpRight,
 } from "lucide-react";
 
 /* ======================================
    DIVISION DATA
 ====================================== */
+
 
 const divisions = [
   {
@@ -38,19 +39,28 @@ const divisions = [
     number: "02",
     title: "Agricultural Commodities",
     description:
-      "Agricultural commodity solutions supporting bulk procurement and business supply requirements.",
+      "Corn-related agricultural commodities, including maize and other corn-based products, supporting bulk procurement and commercial supply requirements.",
     icon: Sprout,
     image: "/about1.jpg",
     tag: "AGRICULTURAL SUPPLY",
   },
   {
     number: "03",
-    title: "Frozen Food Products",
+    title: "Indian Spices",
     description:
-      "Frozen food solutions for food businesses, distributors and commercial buyers.",
-    icon: Snowflake,
-    image: "/fresh.png",
-    tag: "FROZEN FOODS",
+      "Indian spices with a special focus on Turmeric and Turmeric Powder, along with other spice products for bulk and commercial requirements.",
+    icon: Flame,
+    image: "/spice.webp",
+    tag: "TURMERIC & INDIAN SPICES",
+  },
+  {
+    number: "04",
+    title: "Premium Basmati Rice",
+    description:
+      "Premium Basmati Rice for wholesalers, food distributors and commercial buyers, supporting bulk supply requirements.",
+    icon: Wheat,
+    image: "/rice.avif",
+    tag: "BASMATI RICE",
   },
 ];
 
@@ -525,7 +535,13 @@ export default function BusinessDivisions() {
 
       {/* DIVISION GRID */}
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-10">
-        <div className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+        <div className="
+  grid grid-cols-1
+  items-stretch gap-5
+  md:grid-cols-2
+  xl:grid-cols-4
+  lg:gap-6
+">
           {divisions.map((division, index) =>
             isDesktop ? (
               <DesktopDivisionCard

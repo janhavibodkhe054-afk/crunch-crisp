@@ -114,8 +114,8 @@ export default function QualityHero() {
       y: 0,
     },
     transition: {
-      duration: 0.85,
-      delay,
+      duration: reduceMotion ? 0 : 0.85,
+      delay: reduceMotion ? 0 : delay,
       ease,
     },
   });
@@ -219,9 +219,7 @@ export default function QualityHero() {
         <motion.div
           aria-hidden="true"
           animate={
-            reduceMotion
-              ? undefined
-              : { rotate: 360 }
+            reduceMotion ? undefined : { rotate: 360 }
           }
           transition={{
             duration: 55,
@@ -234,9 +232,7 @@ export default function QualityHero() {
         <motion.div
           aria-hidden="true"
           animate={
-            reduceMotion
-              ? undefined
-              : { rotate: -360 }
+            reduceMotion ? undefined : { rotate: -360 }
           }
           transition={{
             duration: 70,
@@ -290,18 +286,18 @@ export default function QualityHero() {
             className="mb-5 flex items-center gap-3"
           >
             <motion.span
-              initial={{ width: 0 }}
+              initial={reduceMotion ? false : { width: 0 }}
               animate={{ width: 38 }}
               transition={{
-                duration: 0.9,
-                delay: 0.2,
+                duration: reduceMotion ? 0 : 0.9,
+                delay: reduceMotion ? 0 : 0.2,
                 ease,
               }}
               className="h-[2px] bg-[#E9AC12]"
             />
 
             <span className="text-[11px] font-extrabold uppercase tracking-[2.5px] text-[#F1C76D]">
-              QUALITY & MANUFACTURING
+              QUALITY & PRODUCT EXCELLENCE
             </span>
           </motion.div>
 
@@ -317,15 +313,18 @@ export default function QualityHero() {
             </span>
           </motion.h1>
 
-          {/* DESCRIPTION */}
+          {/* UPDATED DESCRIPTION */}
           <motion.p
             {...reveal(0.35)}
-            className="mt-6 max-w-[560px] text-[14px] leading-[1.9] text-[#D9E0E8] sm:text-[15px]"
+            className="mt-6 max-w-[580px] text-[14px] leading-[1.9] text-[#D9E0E8] sm:text-[15px]"
           >
-            Our focus is on supplying corn-based products
-            and agricultural commodities that meet the
-            practical requirements of business and
-            industrial customers.
+            At Crunch & Crisp India LLP, our quality-focused
+            approach extends across Corn Processing Products,
+            Agricultural Commodities, Premium Basmati Rice,
+            Turmeric, Indian Spices and Frozen Foods.
+            We focus on understanding product specifications
+            and the practical requirements of commercial
+            and industrial buyers.
           </motion.p>
 
           {/* CTA */}
@@ -370,7 +369,7 @@ export default function QualityHero() {
             />
 
             <span className="text-[11px] font-semibold uppercase tracking-[1.4px] text-white/65">
-              Product Quality • Business Supply
+              Product Quality • Diverse Portfolio • B2B Supply
             </span>
           </motion.div>
         </div>
@@ -395,8 +394,8 @@ export default function QualityHero() {
             scale: 1,
           }}
           transition={{
-            duration: 1.1,
-            delay: 0.25,
+            duration: reduceMotion ? 0 : 1.1,
+            delay: reduceMotion ? 0 : 0.25,
             ease,
           }}
           className="relative z-10 mx-auto w-full max-w-[570px]"
@@ -435,7 +434,7 @@ export default function QualityHero() {
 
               <motion.img
                 src={HERO_IMAGE}
-                alt="Quality-focused corn products"
+                alt="Quality-focused agricultural commodities, grains and food products"
                 initial={{
                   scale: reduceMotion ? 1 : 1.08,
                 }}
@@ -476,7 +475,7 @@ export default function QualityHero() {
             </div>
 
             {/* ======================================
-                QUALITY CARD - FULLY VISIBLE
+                FLOATING QUALITY CARD
             ====================================== */}
 
             <motion.div
@@ -495,8 +494,8 @@ export default function QualityHero() {
                 scale: 1,
               }}
               transition={{
-                duration: 0.8,
-                delay: 0.9,
+                duration: reduceMotion ? 0 : 0.8,
+                delay: reduceMotion ? 0 : 0.9,
                 ease,
               }}
               className="absolute bottom-5 right-3 z-30 sm:bottom-6 sm:right-5"
@@ -550,8 +549,8 @@ export default function QualityHero() {
             scaleX: 1,
           }}
           transition={{
-            duration: 1.5,
-            delay: 0.4,
+            duration: reduceMotion ? 0 : 1.5,
+            delay: reduceMotion ? 0 : 0.4,
             ease,
           }}
           className="h-full w-full origin-left bg-gradient-to-r from-[#E66A16] via-[#F4B51C] to-[#E66A16]"

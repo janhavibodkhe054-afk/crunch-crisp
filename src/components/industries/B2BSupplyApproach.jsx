@@ -8,39 +8,48 @@ import {
   ArrowUpRight,
   ArrowRight,
 } from "lucide-react";
+
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+/* ==========================================
+   B2B SUPPLY PROCESS - 4 STEPS
+========================================== */
 
 const steps = [
   {
     number: "01",
     icon: ClipboardList,
-    title: "Product Specifications",
+    title: "Product Requirements",
     description:
-      "We begin by understanding the type of product your business requires, including relevant specifications, quality expectations and intended usage.",
+      "We begin by understanding your product needs, whether Corn Processing Products, Agricultural Commodities, Premium Basmati Rice, Turmeric, Indian Spices or Frozen Foods, along with the required specifications.",
   },
   {
     number: "02",
     icon: Boxes,
-    title: "Required Quantities",
+    title: "Bulk Order Quantities",
     description:
-      "Every business has different procurement requirements. We discuss your expected order quantity and bulk purchasing needs to understand the scale of supply.",
+      "We discuss your required quantities, purchasing frequency and bulk procurement expectations to understand the scale and nature of your business requirements.",
   },
   {
     number: "03",
     icon: Factory,
     title: "Industry Applications",
     description:
-      "We consider how the product will be used within your business, whether for food processing, feed manufacturing, agricultural operations or industrial applications.",
+      "We identify the intended application, whether food processing, snack manufacturing, animal feed, rice distribution, spice trading, hospitality or other commercial operations.",
   },
   {
     number: "04",
     icon: PackageCheck,
-    title: "Packaging & Supply Needs",
+    title: "Packaging & Supply Planning",
     description:
-      "We discuss packaging preferences and other supply-related requirements before exploring a suitable product and supply solution for your business.",
+      "We discuss packaging preferences, delivery requirements and supply expectations to explore suitable sourcing and bulk supply solutions for your business.",
   },
 ];
+
+/* ==========================================
+   MAIN COMPONENT
+========================================== */
 
 export default function B2BSupplyApproach() {
   useEffect(() => {
@@ -63,7 +72,11 @@ export default function B2BSupplyApproach() {
       <div className="pointer-events-none absolute -right-40 top-0 h-[380px] w-[380px] rounded-full bg-[#FFF4E4]/60 blur-[100px]" />
 
       <div className="relative mx-auto max-w-[1350px] px-5 sm:px-8 lg:px-12">
-        {/* SECTION HEADING */}
+
+        {/* ======================================
+            SECTION HEADING
+        ====================================== */}
+
         <div
           data-aos="fade-up"
           className="mx-auto mb-12 max-w-[780px] text-center lg:mb-16"
@@ -80,15 +93,20 @@ export default function B2BSupplyApproach() {
           </h2>
 
           <p className="mx-auto mt-5 max-w-[750px] text-[14px] leading-[1.9] text-[#72808D] sm:text-[15px]">
-            Our approach focuses on understanding product
-            specifications, required quantities, intended
-            applications and packaging needs before discussing
-            a suitable supply solution.
+            From Corn Processing Products and Agricultural
+            Commodities to Premium Basmati Rice, Indian Spices
+            and Frozen Foods, our B2B approach focuses on
+            understanding product requirements, bulk quantities,
+            industry applications and supply preferences.
           </p>
         </div>
 
-        {/* PROCESS STEPS */}
+        {/* ======================================
+            PROCESS STEPS
+        ====================================== */}
+
         <div className="relative">
+
           {/* CONNECTING LINE - DESKTOP */}
           <div className="absolute left-[12%] right-[12%] top-[37px] hidden h-[2px] bg-gradient-to-r from-[#F1D9B7] via-[#E9AC12] to-[#F1D9B7] lg:block" />
 
@@ -117,8 +135,12 @@ export default function B2BSupplyApproach() {
                     )}
                   </div>
 
-                  {/* STEP CONTENT */}
+                  {/* ======================================
+                      STEP CONTENT
+                  ====================================== */}
+
                   <div className="h-full rounded-[16px] border border-[#EAECEB] bg-[#FAFAF8] px-6 pb-8 pt-7 transition-all duration-500 group-hover:-translate-y-1.5 group-hover:border-[#F1D5AE] group-hover:bg-white group-hover:shadow-[0_18px_45px_rgba(32,42,56,0.09)]">
+
                     {/* ICON */}
                     <div className="mb-5 flex h-[48px] w-[48px] items-center justify-center rounded-xl bg-[#FFF0DD] text-[#E66A16] transition-colors duration-300 group-hover:bg-[#E66A16] group-hover:text-white">
                       <Icon size={23} strokeWidth={1.8} />
@@ -140,7 +162,10 @@ export default function B2BSupplyApproach() {
           </div>
         </div>
 
-        {/* BOTTOM CTA */}
+        {/* ======================================
+            BOTTOM CTA
+        ====================================== */}
+
         <div
           data-aos="fade-up"
           className="mt-14 flex flex-col items-start justify-between gap-5 rounded-[16px] border border-[#F0E4D3] bg-[#FFF9F0] px-6 py-7 sm:px-8 lg:flex-row lg:items-center"
@@ -151,9 +176,11 @@ export default function B2BSupplyApproach() {
             </h3>
 
             <p className="mt-2 max-w-[680px] text-[12px] leading-[1.8] text-[#75818D] sm:text-[13px]">
-              Share your product details, required quantity and
-              business needs. Our team will connect with you
-              to discuss suitable supply options.
+              Looking for Corn Products, Premium Basmati Rice,
+              Turmeric, Turmeric Powder, Indian Spices or
+              Frozen Foods in bulk? Share your product
+              specifications and quantity requirements
+              with our team to discuss suitable supply options.
             </p>
           </div>
 

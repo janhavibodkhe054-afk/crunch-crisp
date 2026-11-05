@@ -12,9 +12,17 @@ import {
   ArrowUpRight,
   Package,
   CheckCircle2,
+  Wheat,
+  CookingPot,
+  Hotel,
 } from "lucide-react";
+
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+/* ==========================================
+   INDUSTRIES DATA
+========================================== */
 
 const industries = [
   {
@@ -22,7 +30,7 @@ const industries = [
     title: "Snack Manufacturing",
     icon: UtensilsCrossed,
     description:
-      "Corn-based ingredients play an important role in the snack manufacturing industry. Our Premium Corn Grits cater to businesses involved in producing a variety of corn-based snack products and processed food items.",
+      "Corn-based ingredients play an important role in snack manufacturing. Our Premium Corn Grits support businesses producing corn-based snacks and processed food products.",
     applications: [
       "Corn-based snack production",
       "Extruded snack processing",
@@ -35,33 +43,39 @@ const industries = [
     title: "Food Processing",
     icon: Factory,
     description:
-      "Food processing businesses require corn ingredients in different forms depending on their manufacturing needs. Our Corn Grits and Fine Corn Powder support a range of commercial food processing applications.",
+      "Food processing businesses require suitable ingredients for different manufacturing applications. Our Corn Grits, Fine Corn Powder and selected agricultural products cater to commercial food processing requirements.",
     applications: [
       "Food ingredient preparation",
       "Corn-based food formulations",
       "Commercial food processing",
     ],
-    products: ["Corn Grits", "Fine Corn Powder"],
+    products: [
+      "Premium Corn Grits",
+      "Fine Corn Powder",
+    ],
   },
   {
     no: "03",
     title: "Cattle Feed",
     icon: Beef,
     description:
-      "Corn-based agricultural ingredients are widely used in cattle feed formulations. We cater to feed manufacturers and agricultural businesses looking for Yellow Crushed Maize and Corn Germ for their production requirements.",
+      "Corn-based agricultural ingredients are widely used in cattle feed formulations. We cater to feed manufacturers and agricultural businesses seeking Yellow Crushed Maize and Corn Germ for their production requirements.",
     applications: [
       "Cattle feed manufacturing",
       "Feed ingredient sourcing",
-      "Livestock nutrition formulations",
+      "Livestock feed formulations",
     ],
-    products: ["Yellow Crushed Maize", "Corn Germ"],
+    products: [
+      "Yellow Crushed Maize",
+      "Whole Yellow Corn Germ",
+    ],
   },
   {
     no: "04",
     title: "Poultry Feed",
     icon: Bird,
     description:
-      "Yellow Crushed Maize is an important raw material in many poultry feed formulations. We support commercial poultry feed manufacturers and agricultural buyers with corn-based ingredient requirements.",
+      "Yellow Crushed Maize is an important raw material in many poultry feed formulations. We support poultry feed manufacturers and commercial buyers with corn-based ingredient sourcing requirements.",
     applications: [
       "Poultry feed production",
       "Commercial feed formulations",
@@ -74,7 +88,7 @@ const industries = [
     title: "Oil Extraction",
     icon: Droplets,
     description:
-      "Whole Yellow Corn Germ is used as a raw material in corn oil extraction processes. Our corn germ offering caters to businesses involved in edible oil processing and related industrial operations.",
+      "Whole Yellow Corn Germ is used as a raw material in corn oil extraction processes. Our product offering caters to businesses involved in edible oil processing and related industrial operations.",
     applications: [
       "Corn oil extraction",
       "Oil processing operations",
@@ -87,20 +101,23 @@ const industries = [
     title: "Agricultural Businesses",
     icon: Sprout,
     description:
-      "Agricultural businesses and commodity distributors require dependable access to suitable products for their commercial activities. We cater to requirements involving Yellow Maize Seeds and other agricultural commodities.",
+      "Agricultural businesses and commodity distributors require access to suitable products for their commercial activities. We cater to requirements involving Yellow Maize Seeds and other corn-related agricultural commodities.",
     applications: [
       "Agricultural commodity sourcing",
       "Commercial distribution",
       "Agricultural business procurement",
     ],
-    products: ["Yellow Maize Seeds", "Commodities"],
+    products: [
+      "Yellow Maize Seeds",
+      "Agricultural Commodities",
+    ],
   },
   {
     no: "07",
     title: "Industrial Processing",
     icon: Cog,
     description:
-      "Corn Cob can be utilized in selected industrial and agricultural processing applications. We cater to commercial buyers seeking corn cob material for their specific processing and raw material requirements.",
+      "Corn Cob can be utilized in selected industrial and agricultural processing applications. We cater to commercial buyers seeking corn cob material for specific processing and raw material requirements.",
     applications: [
       "Selected industrial applications",
       "Agricultural material processing",
@@ -121,7 +138,47 @@ const industries = [
     ],
     products: ["Frozen Food Range"],
   },
+
+  /* ==========================================
+     NEW INDUSTRIES
+  ========================================== */
+
+  {
+    no: "09",
+    title: "Rice & Grain Distribution",
+    icon: Wheat,
+    description:
+      "Rice wholesalers, grain traders and food distributors require suitable products for their commercial supply operations. Our Premium Basmati Rice offering supports bulk sourcing and distribution requirements.",
+    applications: [
+      "Wholesale rice distribution",
+      "Bulk grain procurement",
+      "Retail and commercial supply",
+    ],
+    products: ["Premium Basmati Rice"],
+  },
+  {
+    no: "10",
+    title: "Spice Processing & Distribution",
+    icon: CookingPot,
+    description:
+      "Our Indian Spices portfolio focuses especially on Turmeric and Turmeric Powder. We cater to spice traders, food processors and wholesale distributors seeking products for commercial and bulk procurement.",
+    applications: [
+      "Turmeric sourcing and distribution",
+      "Turmeric Powder procurement",
+      "Spice trading and food processing",
+    ],
+    products: [
+      "Turmeric",
+      "Turmeric Powder",
+      "Indian Spices",
+    ],
+  },
+  
 ];
+
+/* ==========================================
+   MAIN COMPONENT
+========================================== */
 
 export default function IndustryApplications() {
   useEffect(() => {
@@ -145,7 +202,10 @@ export default function IndustryApplications() {
 
       <div className="relative mx-auto max-w-[1350px] px-5 sm:px-8 lg:px-12">
 
-        {/* SECTION HEADING */}
+        {/* ======================================
+            SECTION HEADING
+        ====================================== */}
+
         <div
           data-aos="fade-up"
           className="mx-auto mb-12 max-w-[780px] text-center lg:mb-14"
@@ -161,16 +221,20 @@ export default function IndustryApplications() {
             </span>
           </h2>
 
-          <p className="mx-auto mt-5 max-w-[680px] text-[14px] leading-[1.9] text-[#74808C] sm:text-[15px]">
-            Different industries require different agricultural
-            and corn-based raw materials. Explore how our product
-            portfolio supports food manufacturers, feed producers,
-            agricultural businesses and commercial distributors
-            across various applications.
+          <p className="mx-auto mt-5 max-w-[720px] text-[14px] leading-[1.9] text-[#74808C] sm:text-[15px]">
+            From corn processing and agricultural commodities
+            to Premium Basmati Rice, Turmeric, Indian Spices
+            and Frozen Foods, our product portfolio supports
+            the sourcing needs of food manufacturers,
+            distributors, agricultural businesses and
+            commercial buyers across multiple industries.
           </p>
         </div>
 
-        {/* INDUSTRY CARDS */}
+        {/* ======================================
+            INDUSTRY CARDS
+        ====================================== */}
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-7">
           {industries.map((industry, index) => {
             const Icon = industry.icon;
@@ -185,7 +249,10 @@ export default function IndustryApplications() {
                 {/* TOP ACCENT */}
                 <div className="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 bg-gradient-to-r from-[#E66A16] to-[#E9AC12] transition-transform duration-500 group-hover:scale-x-100" />
 
-                {/* CARD HEADER */}
+                {/* ======================================
+                    CARD HEADER
+                ====================================== */}
+
                 <div className="mb-6 flex items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-[15px] bg-[#FFF3E4] text-[#E66A16] transition-colors duration-300 group-hover:bg-[#E66A16] group-hover:text-white">
@@ -213,7 +280,10 @@ export default function IndustryApplications() {
                   {industry.description}
                 </p>
 
-                {/* APPLICATIONS */}
+                {/* ======================================
+                    APPLICATIONS
+                ====================================== */}
+
                 <div className="mt-7">
                   <h4 className="mb-3 text-[11px] font-extrabold uppercase tracking-[1.7px] text-[#202A38]">
                     Industry Applications
@@ -236,7 +306,10 @@ export default function IndustryApplications() {
                   </div>
                 </div>
 
-                {/* RELEVANT PRODUCTS */}
+                {/* ======================================
+                    RELEVANT PRODUCTS
+                ====================================== */}
+
                 <div className="mt-auto pt-7">
                   <div className="border-t border-[#E9ECEF] pt-5">
                     <h4 className="mb-3 text-[11px] font-extrabold uppercase tracking-[1.7px] text-[#202A38]">
@@ -261,7 +334,10 @@ export default function IndustryApplications() {
           })}
         </div>
 
-        {/* BOTTOM CTA */}
+        {/* ======================================
+            BOTTOM CTA
+        ====================================== */}
+
         <div
           data-aos="fade-up"
           className="mt-12 flex flex-col items-start justify-between gap-6 rounded-[16px] bg-[#202A38] px-6 py-7 text-white sm:px-9 lg:flex-row lg:items-center"
@@ -272,9 +348,11 @@ export default function IndustryApplications() {
             </h3>
 
             <p className="mt-2 max-w-[650px] text-[13px] leading-[1.8] text-[#D2D9E0]">
-              Connect with our team to discuss suitable
-              agricultural products, corn-based ingredients
-              and bulk procurement requirements for your business.
+              Connect with our team to discuss corn processing
+              products, agricultural commodities, Premium
+              Basmati Rice, Turmeric, Indian Spices, Frozen
+              Foods and bulk procurement requirements
+              for your business.
             </p>
           </div>
 

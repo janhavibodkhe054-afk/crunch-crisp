@@ -1,5 +1,5 @@
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   motion,
@@ -15,53 +15,102 @@ const WHATSAPP_NUMBER = "918983973799";
 
 const ease = [0.22, 1, 0.36, 1];
 
+/* ==========================================
+   PRODUCTS DATA
+========================================== */
+
 const products = [
   {
     name: "Yellow Crushed Maize",
     image: "/product1.png",
     description:
-      "High-energy corn material for cattle and poultry feed.",
+      "Crushed maize for cattle feed, poultry feed and commercial agricultural applications.",
   },
   {
     name: "Premium Corn Grits",
     image: "/product2.jpg",
     description:
-      "Quality corn grits for snacks, food processing and breweries.",
+      "Quality corn grits for snack manufacturing, food processing and other industrial requirements.",
   },
   {
     name: "Fine Corn Powder",
     image: "/product3.jpg",
     description:
-      "Finely milled corn powder for food and industrial applications.",
+      "Finely milled corn powder for food processing and commercial applications.",
   },
   {
     name: "Yellow Maize Seeds",
     image: "/product4.jpeg",
     description:
-      "Maize seeds for agricultural sourcing and cultivation.",
+      "Yellow maize seeds for agricultural sourcing, cultivation and bulk commodity requirements.",
   },
   {
     name: "Whole Yellow Corn Germ",
     image: "/product5.webp",
     description:
-      "Corn germ for oil extraction and animal feed manufacturing.",
+      "Whole yellow corn germ for oil extraction, feed manufacturing and industrial applications.",
   },
   {
     name: "Corn Cob",
     image: "/product6.jpg",
     description:
-      "Corn cob raw material for agricultural and industrial uses.",
+      "Corn cob raw material for agricultural, commercial and industrial uses.",
+  },
+  {
+    name: "Premium Basmati Rice",
+    image: "/product7.jpg",
+    description:
+      "Premium Basmati Rice for wholesalers, food distributors and bulk commercial supply requirements.",
+  },
+  {
+    name: "Turmeric & Turmeric Powder",
+    image: "/turm.avif",
+    description:
+      "Turmeric and Turmeric Powder for spice distributors, food businesses and commercial procurement.",
+  },
+  {
+    name: "Indian Spices",
+    image: "/product8.jpg",
+    description:
+      "A selection of Indian spices, with a special focus on turmeric, for wholesale and bulk supply.",
   },
 ];
 
 /* ==========================================
-   INTERACTIVE 3D PRODUCT CARD
+   MOBILE DETECTION
+========================================== */
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 1023px)").matches
+      : false
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)");
+
+    const update = () => setIsMobile(media.matches);
+
+    update();
+
+    media.addEventListener("change", update);
+
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
+
+/* ==========================================
+   INTERACTIVE PRODUCT CARD
 ========================================== */
 
 function ProductCard({
   product,
   index,
   reduceMotion,
+  isMobile,
   onEnquiry,
 }) {
   const cardRef = useRef(null);
@@ -86,9 +135,11 @@ function ProductCard({
     mass: 0.7,
   });
 
+  const desktopEffects = !isMobile && !reduceMotion;
+
   const handleMouseMove = (event) => {
     if (
-      reduceMotion ||
+      !desktopEffects ||
       event.pointerType !== "mouse" ||
       !cardRef.current
     ) {
@@ -112,6 +163,13 @@ function ProductCard({
     mouseY.set(0);
   };
 
+  useEffect(() => {
+    if (!desktopEffects) {
+      mouseX.set(0);
+      mouseY.set(0);
+    }
+  }, [desktopEffects, mouseX, mouseY]);
+
   return (
     <motion.article
       ref={cardRef}
@@ -119,12 +177,12 @@ function ProductCard({
       onPointerLeave={resetTilt}
       initial={
         reduceMotion
-          ? { opacity: 1 }
+          ? false
           : {
               opacity: 0,
-              y: 65,
-              scale: 0.9,
-              rotateX: 12,
+              y: isMobile ? 22 : 65,
+              scale: isMobile ? 0.98 : 0.9,
+              rotateX: isMobile ? 0 : 12,
             }
       }
       animate={
@@ -138,22 +196,26 @@ function ProductCard({
           : undefined
       }
       transition={{
-        duration: 0.85,
-        delay: (index % 3) * 0.12,
+        duration: reduceMotion ? 0 : isMobile ? 0.45 : 0.85,
+        delay: isMobile ? 0 : (index % 3) * 0.12,
         ease,
       }}
       className="group relative"
       style={{
-        perspective: "1200px",
+        perspective: isMobile ? "none" : "1200px",
       }}
     >
       {/* MOUSE RESPONSIVE 3D CARD */}
       <motion.div
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-        }}
+        style={
+          desktopEffects
+            ? {
+                rotateX,
+                rotateY,
+                transformStyle: "preserve-3d",
+              }
+            : undefined
+        }
         className="relative"
       >
         {/* ======================================
@@ -161,31 +223,33 @@ function ProductCard({
         ====================================== */}
 
         <div className="relative h-[190px] overflow-hidden rounded-[13px] bg-[#EFE9DE] sm:h-[205px] lg:h-[215px]">
+
           {/* IMAGE ZOOM */}
           <motion.img
             src={product.image}
             alt={product.name}
             loading="lazy"
+            decoding="async"
             draggable={false}
             whileHover={
-              reduceMotion
-                ? undefined
-                : {
+              desktopEffects
+                ? {
                     scale: 1.13,
                   }
+                : undefined
             }
             transition={{
               duration: 0.8,
               ease,
             }}
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="h-full w-full object-cover lg:transition-transform lg:duration-700 lg:group-hover:scale-110"
           />
 
           {/* DARK IMAGE GRADIENT */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#202A38]/15 to-transparent" />
 
-          {/* MOVING GOLDEN LIGHT */}
-          {!reduceMotion && (
+          {/* MOVING GOLDEN LIGHT - DESKTOP ONLY */}
+          {desktopEffects && inView && (
             <motion.div
               aria-hidden="true"
               animate={{
@@ -213,20 +277,29 @@ function ProductCard({
 
         <motion.div
           whileHover={
-            reduceMotion
-              ? undefined
-              : {
+            desktopEffects
+              ? {
                   y: -8,
                   scale: 1.025,
                 }
+              : undefined
+          }
+          whileTap={
+            !reduceMotion
+              ? {
+                  scale: 0.99,
+                }
+              : undefined
           }
           transition={{
             duration: 0.4,
             ease,
           }}
-          className="relative z-10 mx-auto -mt-10 flex min-h-[185px] w-[88%] flex-col items-center rounded-[14px] border border-[#ECECEC] bg-white px-5 py-6 text-center shadow-[0_10px_28px_rgba(32,42,56,0.10)] transition-shadow duration-500 group-hover:shadow-[0_20px_45px_rgba(32,42,56,0.17)]"
+          className="relative z-10 mx-auto -mt-10 flex min-h-[205px] w-[88%] flex-col items-center rounded-[14px] border border-[#ECECEC] bg-white px-5 py-6 text-center shadow-[0_10px_28px_rgba(32,42,56,0.10)] transition-shadow duration-500 lg:group-hover:shadow-[0_20px_45px_rgba(32,42,56,0.17)]"
           style={{
-            transformStyle: "preserve-3d",
+            transformStyle: desktopEffects
+              ? "preserve-3d"
+              : "flat",
           }}
         >
           {/* TOP GOLDEN ACCENT */}
@@ -234,21 +307,25 @@ function ProductCard({
             initial={{
               width: 30,
             }}
-            whileHover={{
-              width: 65,
-            }}
+            whileHover={
+              desktopEffects
+                ? {
+                    width: 65,
+                  }
+                : undefined
+            }
             transition={{
               duration: 0.35,
             }}
             className="mb-3 h-[3px] rounded-full bg-gradient-to-r from-[#E66A16] to-[#E9AC12]"
           />
 
-          {/* PRODUCT NAME - BIGGER */}
+          {/* PRODUCT NAME */}
           <h3 className="text-[17px] font-extrabold leading-[1.4] text-[#202A38] sm:text-[18px] lg:text-[19px]">
             {product.name}
           </h3>
 
-          {/* DESCRIPTION - BIGGER */}
+          {/* DESCRIPTION */}
           <p className="mt-3 max-w-[290px] text-[13px] leading-[1.75] text-[#66717E] sm:text-[14px]">
             {product.description}
           </p>
@@ -258,20 +335,24 @@ function ProductCard({
             type="button"
             onClick={() => onEnquiry(product.name)}
             whileHover={
-              reduceMotion
-                ? undefined
-                : {
+              desktopEffects
+                ? {
                     y: -3,
                     scale: 1.06,
                   }
+                : undefined
             }
-            whileTap={{
-              scale: 0.96,
-            }}
+            whileTap={
+              reduceMotion
+                ? undefined
+                : {
+                    scale: 0.96,
+                  }
+            }
             transition={{
               duration: 0.25,
             }}
-            className="mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#E66A16] to-[#E9AC12] px-6 py-2.5 text-[12px] font-extrabold uppercase tracking-[0.7px] text-white shadow-[0_5px_15px_rgba(230,106,22,0.18)] hover:shadow-[0_10px_25px_rgba(230,106,22,0.3)]"
+            className="mt-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#E66A16] to-[#E9AC12] px-6 py-2.5 text-[12px] font-extrabold uppercase tracking-[0.7px] text-white shadow-[0_5px_15px_rgba(230,106,22,0.18)] lg:hover:shadow-[0_10px_25px_rgba(230,106,22,0.3)]"
           >
             Enquire Now
 
@@ -289,7 +370,9 @@ function ProductCard({
 
 export default function DetailedProducts() {
   const sectionRef = useRef(null);
+
   const reduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
 
   const inView = useInView(sectionRef, {
     once: true,
@@ -321,43 +404,52 @@ export default function DetailedProducts() {
           ANIMATED BACKGROUND GLOWS
       ====================================== */}
 
-      <motion.div
-        aria-hidden="true"
-        animate={
-          inView && !reduceMotion
-            ? {
-                x: [-30, 40, -30],
-                y: [0, 25, 0],
-                scale: [1, 1.15, 1],
-              }
-            : undefined
-        }
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="pointer-events-none absolute -left-40 top-10 -z-10 h-[450px] w-[450px] rounded-full bg-[#F5D8A5]/20 blur-[110px]"
-      />
+      {!isMobile && (
+        <>
+          <motion.div
+            aria-hidden="true"
+            animate={
+              inView && !reduceMotion
+                ? {
+                    x: [-30, 40, -30],
+                    y: [0, 25, 0],
+                    scale: [1, 1.15, 1],
+                  }
+                : undefined
+            }
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="pointer-events-none absolute -left-40 top-10 -z-10 h-[450px] w-[450px] rounded-full bg-[#F5D8A5]/20 blur-[110px]"
+          />
 
-      <motion.div
-        aria-hidden="true"
-        animate={
-          inView && !reduceMotion
-            ? {
-                x: [30, -35, 30],
-                y: [0, -20, 0],
-                scale: [1, 1.12, 1],
-              }
-            : undefined
-        }
-        transition={{
-          duration: 14,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="pointer-events-none absolute -right-40 bottom-0 -z-10 h-[450px] w-[450px] rounded-full bg-[#E9AC12]/10 blur-[110px]"
-      />
+          <motion.div
+            aria-hidden="true"
+            animate={
+              inView && !reduceMotion
+                ? {
+                    x: [30, -35, 30],
+                    y: [0, -20, 0],
+                    scale: [1, 1.12, 1],
+                  }
+                : undefined
+            }
+            transition={{
+              duration: 14,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="pointer-events-none absolute -right-40 bottom-0 -z-10 h-[450px] w-[450px] rounded-full bg-[#E9AC12]/10 blur-[110px]"
+          />
+        </>
+      )}
+
+      {/* MOBILE STATIC BACKGROUND */}
+      {isMobile && (
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-[#FFFDF8] via-[#F8F8F6] to-[#FFF8EF]" />
+      )}
 
       <div className="relative mx-auto max-w-[1350px] px-5 sm:px-8 lg:px-12">
 
@@ -366,10 +458,14 @@ export default function DetailedProducts() {
         ====================================== */}
 
         <motion.div
-          initial={{
-            opacity: 0,
-            y: reduceMotion ? 0 : 35,
-          }}
+          initial={
+            reduceMotion
+              ? false
+              : {
+                  opacity: 0,
+                  y: isMobile ? 15 : 35,
+                }
+          }
           animate={
             inView
               ? {
@@ -379,7 +475,7 @@ export default function DetailedProducts() {
               : undefined
           }
           transition={{
-            duration: 0.8,
+            duration: reduceMotion ? 0 : isMobile ? 0.45 : 0.8,
             ease,
           }}
           className="mb-12 text-center"
@@ -390,7 +486,6 @@ export default function DetailedProducts() {
 
           <h2 className="mt-3 text-[clamp(32px,3.5vw,46px)] font-extrabold tracking-[-1px] text-[#202A38]">
             Our{" "}
-
             <span className="text-[#E66A16]">
               Products
             </span>
@@ -398,27 +493,38 @@ export default function DetailedProducts() {
 
           {/* ANIMATED GOLDEN UNDERLINE */}
           <motion.div
-            initial={{
-              width: 0,
-            }}
-            animate={
-              inView
-                ? {
-                    width: 75,
+            initial={
+              reduceMotion
+                ? false
+                : {
+                    scaleX: 0,
                   }
-                : undefined
             }
+            animate={{
+              scaleX: 1,
+            }}
             transition={{
-              duration: 1,
+              duration: isMobile ? 0.6 : 1,
               delay: 0.25,
               ease,
             }}
-            className="mx-auto mt-5 h-[3px] rounded-full bg-gradient-to-r from-[#E66A16] to-[#E9AC12]"
+            style={{
+              transformOrigin: "center",
+            }}
+            className="mx-auto mt-5 h-[3px] w-[75px] rounded-full bg-gradient-to-r from-[#E66A16] to-[#E9AC12]"
           />
+
+          <p className="mx-auto mt-5 max-w-[750px] text-[13px] leading-[1.9] text-[#66717E] sm:text-[15px]">
+            Explore our range of corn processing products,
+            corn-related agricultural commodities, premium
+            Basmati Rice and Indian Spices, including Turmeric
+            and Turmeric Powder, for commercial and bulk supply
+            requirements.
+          </p>
         </motion.div>
 
         {/* ======================================
-            3D PRODUCT GRID
+            PRODUCT GRID
         ====================================== */}
 
         <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8">
@@ -428,6 +534,7 @@ export default function DetailedProducts() {
               product={product}
               index={index}
               reduceMotion={reduceMotion}
+              isMobile={isMobile}
               onEnquiry={handleEnquiry}
             />
           ))}

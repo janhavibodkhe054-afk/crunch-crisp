@@ -405,7 +405,7 @@ export default function BusinessPhilosophy() {
                   className="group relative h-[245px] w-[245px] overflow-hidden rounded-full border-[8px] border-white shadow-[0_25px_65px_rgba(32,42,56,0.13)] sm:h-[355px] sm:w-[355px] lg:h-[400px] lg:w-[400px]"
                 >
                   <motion.img
-                    src="/corn.jpg"
+                    src="/turmeric.webp"
                     alt="Quality corn and agricultural products"
                     loading="lazy"
                     draggable={false}

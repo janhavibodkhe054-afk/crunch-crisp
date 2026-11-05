@@ -531,7 +531,7 @@ export default function Hero() {
                   decoding="async"
                   className="
                     relative z-10
-                    max-h-[260px] w-full
+                    max-h-[200px] w-full
                     object-contain
                     sm:max-h-[360px]
                     lg:ml-40

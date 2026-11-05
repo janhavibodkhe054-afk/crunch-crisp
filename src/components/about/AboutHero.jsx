@@ -172,7 +172,7 @@ export default function AboutHero() {
         "
       >
         <motion.img
-          src="/corn.jpg"
+          src="/abouthero.jpg"
           alt=""
           decoding="async"
           fetchPriority="high"
